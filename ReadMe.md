@@ -1,7 +1,5 @@
 ![GodotArch](assets/images/godot-arch-logo.png)
 
-> ⚠️ **WARNING**: This tool is currently in early development and not ready for production use. Configuration options are not yet implemented, which makes it difficult to integrate with existing projects or handle edge cases. Use at your own risk.
-
 An executable that lints project structure in your Godot project. GodotArch helps enforce consistent organization and naming conventions across your Godot projects, making them more maintainable and easier to navigate.
 
 ## Installation
@@ -51,19 +49,9 @@ The executable will be available in `target/release/godot-arch`.
 - [ ] Split code into modules for better maintainability
 - [ ] Write unit tests for core functionality
 
-### Usability
-- [ ] Configuration system
-    - [ ] Support for custom glob patterns to ignore specific files/folders
-    - [ ] Configurable node naming exceptions (e.g., *URL*, *HBoxContainer*, etc.)
-    - [ ] Optional support for *SCREAMING_SNAKE_CASE* in node names (useful for translation keys)
-    - [ ] Custom directory structure definitions
-    - [ ] Ability to gradually adopt rules in existing projects
-
-### Quality Assurance
-- [ ] Validate autoload scenes are properly configured
-- [ ] Ensure scene root nodes have accompanying scripts in the correct location
-- [ ] Enforce consistent folder naming conventions
-- [ ] Provide detailed error messages and suggestions for fixes
+### Additional Tests
+- [ ] Scripts and Scenes configured as autoload in project settings are actually inside of autoload and vice versa
+- [ ] Root nodes of a scene that contain a script should have that script next to that scene
 
 ## Contributing
 

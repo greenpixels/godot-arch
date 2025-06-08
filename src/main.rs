@@ -160,12 +160,11 @@ fn handle_file(input_path_string: &str, entry: &DirEntry) {
             .to_str()
             .unwrap_or("")
             .to_owned(),
-        relative_path: format!("./{}", full_path
-            .strip_prefix(input_path_string)
-            .unwrap_or(file_name)
-            .replace('\\', "/")
-            .trim_start_matches('/')
-            .to_owned())
+        relative_path: normalize_path(
+            full_path
+                .strip_prefix(input_path_string)
+                .unwrap_or(file_name)
+        )
     };
         
     validate_file(file_under_test, extension)
@@ -229,12 +228,16 @@ fn validate_parent_has_same_name(file: &FileUnderTest) {
     );
 }
 
+fn normalize_path(path: &str) -> String {
+    format!("./{}", path
+        .replace('\\', "/")
+        .trim_start_matches('/')
+        .to_owned())
+}
+
 fn should_skip_file(file: &FileUnderTest) -> bool {
-    println!("{}", &file.relative_path);
     for pattern in IGNORE_PATTERNS.iter() {
-        println!("{} vs {}", &file.relative_path, pattern.as_str());
         if pattern.matches(&file.relative_path) {
-            println!("Matched pattern");
             return true;
         }
     }
@@ -419,6 +422,18 @@ fn handle_validation_result(is_success: bool, rule_name: String, success_message
 
 fn visit_dirs(path_string: &str, dir: &Path, cb: &dyn Fn(&str, &DirEntry)) -> io::Result<()> {
     if dir.is_dir() {
+        let normalized_path = normalize_path(
+            dir.strip_prefix(path_string)
+                .unwrap_or(dir)
+                .to_str()
+                .unwrap_or("")
+        );
+        
+        for pattern in IGNORE_PATTERNS.iter() {
+            if pattern.matches(&normalized_path) {
+                return Ok(());
+            }
+        }
         
         for entry in read_dir(dir)? {
             let entry = entry?;

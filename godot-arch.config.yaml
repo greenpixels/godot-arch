@@ -1,11 +1,14 @@
 # File patterns listed here will be ignored
 ignorePatterns:
     overall:
-        - ./**
         - ./godot-arch.exe
         - ./godot-arch.config.yaml
         - ./addons/**
-        - ./target/**
+        - ./export/**
+        - ./.export_templates/**
+        - ./.git
+        - ./.github
+        - ./.godot
     "rule-allowed-file-location":
     "rule-filename-snake-case":
     "rule-parent-has-same-name":
