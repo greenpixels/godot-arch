@@ -167,7 +167,7 @@ fn validate_file(file: FileUnderTest, extension: &str) {
         return;
     }
     println!("\n\n>> Testing {} in {}...", file.file_name.yellow(), file.relative_path.yellow());
-    validate_file_parent(&file);
+    validate_file_root(&file);
     validate_name(&file);
     match extension {
         "tscn" => {
@@ -196,8 +196,9 @@ fn validate_parent_has_same_name(file: &FileUnderTest) {
         }
     }
 
-    print_validation_result(
+    handle_validation_result(
         has_parent_with_same_name,
+        "rule-parent-has-same-name".to_owned(),
         format!(
             "{} is placed in a folder with the same name",
             file.file_name.bold()
@@ -267,8 +268,9 @@ fn validate_scene_nodes(file: FileUnderTest) {
             if let Some(pascal_case) = UPPERCASE_TO_PASCAL_CASE.get(node_name_to_test.as_str()) {
                 node_name_to_test = pascal_case.to_string();
             }
-            print_validation_result(
+            handle_validation_result(
                 node_name_to_test.is_pascal_case(),
+                "rule-scene-nodes-pascal-case".to_owned(),
                 format!(
                     "Used PascalCase naming-convention for node {} in scene '{}'",
                     node_name.bold(),
@@ -285,8 +287,9 @@ fn validate_scene_nodes(file: FileUnderTest) {
 }
 
 fn validate_name(file: &FileUnderTest) {
-    print_validation_result(
+    handle_validation_result(
         file.file_name.is_snake_case(),
+        "rule-filename-snake-case".to_owned(),
         format!(
             "Used snake_case naming-convention in filename for '{}'",
             file.file_name.bold()
@@ -298,7 +301,7 @@ fn validate_name(file: &FileUnderTest) {
     );
 }
 
-fn validate_file_parent(file: &FileUnderTest) {
+fn validate_file_root(file: &FileUnderTest) {
     if file.expected_root_folders.is_empty() {
         return;
     }
@@ -314,8 +317,9 @@ fn validate_file_parent(file: &FileUnderTest) {
 
     let folders_list = file.expected_root_folders.join(" or \\");
 
-    print_validation_result(
+    handle_validation_result(
         in_correct_root,
+        "rule-allowed-file-location".to_owned(),
         format!("Found {} in correct location", file.file_name.bold()),
         format!(
             "Expected {} to be in \\{} directory, but was instead in {}",
@@ -326,10 +330,10 @@ fn validate_file_parent(file: &FileUnderTest) {
     );
 }
 
-fn print_validation_result(is_success: bool, success_message: String, error_message: String) {
+fn handle_validation_result(is_success: bool, rule_name: String, success_message: String, error_message: String) {
     if is_success {
         if SHOULD_PRINT_SUCCESS {
-            println!("\t{}: {}", "Test Succesful".green(), success_message)
+            println!("\t{} ({}): {}", "Test Succesful".green(), rule_name.bright_black(), success_message)
         }
     } else {
         println!("\t{}: {}", "Test Failed".red(), error_message);
