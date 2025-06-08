@@ -1,38 +1,70 @@
 ![GodotArch](assets/images/godot-arch-logo.png)
 
-An executable that lints project structure in your Godot project.
+> ⚠️ **WARNING**: This tool is currently in early development and not ready for production use. Configuration options are not yet implemented, which makes it difficult to integrate with existing projects or handle edge cases. Use at your own risk.
 
-## Project Structure Requirements
+An executable that lints project structure in your Godot project. GodotArch helps enforce consistent organization and naming conventions across your Godot projects, making them more maintainable and easier to navigate.
 
-- Everything ...
-    - **MUST** have its filename in `snake_case`
-- Scenes ...
-    - **MUST** be in `(ROOT)/scenes/**` or `(ROOT)/autoload/**`
-    - **MUST** have a root node with the same name as the file, but in *PascalCase*
-    - **MUST** be in a folder that has the same name as the file
+## Installation
 
-- Scripts ...
-    - **MUST** be in `(ROOT)/scenes/**` or `(ROOT)/autoload/**`
-    - **MUST** be in a folder that has the same name as the file
+Currently, you can only build from source (until a proper stable release is published):
+```bash
+cargo build --release
+```
+The executable will be available in `target/release/godot-arch`.
+
+## Rules
+
+### Files
+- **MUST** have filename in `snake_case`
+
+### Scenes (.tscn)
+- **MUST** be in `(ROOT)/scenes/**` or `(ROOT)/globals/**`
+- **MUST** have root node with same name as file in *PascalCase*
+- **MUST** be in folder with same name as file
+
+### Scripts (.gd)
+- **MUST** be in `(ROOT)/scenes/**`, `(ROOT)/globals/**`, `(ROOT)/resources/**`, or `(ROOT)/test/**`
+- **MUST** be in folder with same name as file
+
+### Resources (.tres)
+- **MUST** be in `(ROOT)/resources/**`
+- **MUST** be in folder with same name as file
+
+### Shaders (.gdshader)
+- **MUST** be in `(ROOT)/shaders/**`
+
+### Translations (.translation)
+- **MUST** be in `(ROOT)/localization/**`
+
+### Assets
+- Images (.png, .jpg, etc.) **MUST** be in `(ROOT)/assets/images/**`
+- Audio (.wav, .ogg, etc.) **MUST** be in `(ROOT)/assets/audio/**`
+
+### Nodes
 - Nodes ...
-  - **MUST** have their name as *PascalCase*
-- Resources ...
-    - **MUST** be in `(ROOT)/resources/**`
-    - **MUST** be in a folder that has the same name as the file
+    - **MUST** have their name in *PascalCase*
+    - This helps maintain consistency with Godot's built-in node naming conventions
 
-## Roadmap
+## Planned Features
 
 ### Maintenance
-- [ ] Split code into modules
-- [ ] Write unit tests 
+- [ ] Split code into modules for better maintainability
+- [ ] Write unit tests for core functionality
 
 ### Usability
-- [ ] Make it possible to add in a configuration that changes behaviour
-    - [ ] Make it possible to add glob patterns for ignoring files
-    - [ ] Add exceptions for NodeName-Linting (e.g *URL*, *HBoxContainer*, ...)
-    - [ ] Add an option to allow SCREAMING_SNAKE_CASE in NodeNames for translation-keys
+- [ ] Configuration system
+    - [ ] Support for custom glob patterns to ignore specific files/folders
+    - [ ] Configurable node naming exceptions (e.g., *URL*, *HBoxContainer*, etc.)
+    - [ ] Optional support for *SCREAMING_SNAKE_CASE* in node names (useful for translation keys)
+    - [ ] Custom directory structure definitions
+    - [ ] Ability to gradually adopt rules in existing projects
 
-### Tests to Implement
-- [ ] Test whether scenes inside `/autoload` are actually inside the autoload configuration
-- [ ] Test the top-level node in a scene has a script and if so, whether that script is right next to the scene file
-- [ ] Test whether all folders are snake_case
+### Quality Assurance
+- [ ] Validate autoload scenes are properly configured
+- [ ] Ensure scene root nodes have accompanying scripts in the correct location
+- [ ] Enforce consistent folder naming conventions
+- [ ] Provide detailed error messages and suggestions for fixes
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
