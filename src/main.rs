@@ -4,62 +4,99 @@ use std::env;
 use std::fs::{DirEntry, exists, read_dir};
 use std::io;
 use std::path::{Path, PathBuf};
+use serde::Deserialize;
+use std::collections::HashMap;
+use glob::Pattern;
+
+#[derive(Debug, Deserialize)]
+struct Config {
+    #[serde(default)]
+    #[serde(rename = "ignorePatterns")]
+    ignore_patterns: IgnorePatterns,
+    #[serde(default)]
+    #[serde(rename = "allowedFileLocations")]
+    allowed_file_locations: HashMap<String, Vec<String>>,
+    #[serde(default)]
+    #[serde(rename = "partialNodeNameRewrites")]
+    partial_node_name_rewrites: Vec<HashMap<String, String>>,
+    #[serde(default)]
+    #[serde(rename = "allowScreamingSnakeCaseInNodeNames")]
+    allow_screaming_snake_case_in_node_names: bool,
+}
+
+#[derive(Debug, Deserialize, Default)]
+struct IgnorePatterns {
+    #[serde(default)]
+    overall: Vec<String>,
+    #[serde(rename = "rule-allowed-file-location")]
+    #[serde(default)]
+    allowed_file_location: Vec<String>,
+    #[serde(rename = "rule-filename-snake-case")]
+    #[serde(default)]
+    filename_snake_case: Vec<String>,
+    #[serde(rename = "rule-parent-has-same-name")]
+    #[serde(default)]
+    parent_has_same_name: Vec<String>,
+    #[serde(rename = "rule-scene-nodes-pascal-case")]
+    #[serde(default)]
+    scene_nodes_pascal_case: Vec<String>,
+}
 
 static mut VALIDATION_COUNT: i32 = 0;
 static mut VALIDATION_FAILS: i32 = 0;
 const SHOULD_PRINT_SUCCESS: bool = true;
+
+lazy_static::lazy_static! {
+    static ref CONFIG: Config = {
+        let config_content = std::fs::read_to_string("godot-arch.config.yaml")
+            .expect("Failed to read config file");
+        serde_yaml::from_str(&config_content)
+            .expect("Failed to parse config file")
+    };
+
+    static ref UPPERCASE_TO_PASCAL_CASE: HashMap<String, String> = {
+        let mut m = HashMap::new();
+        for rewrite in &CONFIG.partial_node_name_rewrites {
+            for (k, v) in rewrite {
+                m.insert(k.clone(), v.clone());
+            }
+        }
+        m
+    };
+
+    static ref IGNORE_PATTERNS: Vec<Pattern> = {
+        CONFIG.ignore_patterns.overall
+            .iter()
+            .filter_map(|p| Pattern::new(p).ok())
+            .collect()
+    };
+}
+
 struct FileUnderTest {
     absolute_path: String,
     relative_path: String,
     file_name: String,
     path: PathBuf,
     extension: String,
-    expected_root_folders: Vec<String>,
 }
 
-use lazy_static::lazy_static;
-use std::collections::HashMap;
-
-lazy_static! {
-    static ref UPPERCASE_TO_PASCAL_CASE: HashMap<&'static str, &'static str> = {
-        let mut m = HashMap::new();
-        m.insert("GPU", "Gpu");
-        m.insert("URL", "Url");
-        m.insert("HTTP", "Http");
-        m.insert("VBoxContainer", "VerticalBoxContainer");
-        m.insert("HBoxContainer", "HorizontalBoxContainer");
-        m.insert("HFlowContainer", "HorizontalFlowContainer");
-        m.insert("VFlowContainer", "VerticalFlowContainer");
-        m.insert("HScrollBar", "HorizontalScrollBar");
-        m.insert("HSplitContainer", "HorizontalSplitContainer");
-        m.insert("VSplitContainer", "VerticalSplitContainer");
-        m.insert("VScrollBar", "VerticalScrollBar");
-        m.insert("HSlider", "HorizontalSlider");
-        m.insert("VSlider", "VerticalSlider");
-        m.insert("HSeperator", "HorizontalSeperator");
-        m.insert("VSeperator", "VerticalSeperator");
-        m.insert("CPU", "Cpu");
-        m.insert("VoxelGI", "VoxelGlobalIllumination");
-        m.insert("LightmapGI", "LightmapGlobalIllumination");
-        m
-    };
-}
-
-#[cfg(windows)]
 fn enable_ansi_support() {
-    use std::ptr::null_mut;
-    use winapi::um::consoleapi::GetConsoleMode;
-    use winapi::um::consoleapi::SetConsoleMode;
-    use winapi::um::processenv::GetStdHandle;
-    use winapi::um::winbase::STD_OUTPUT_HANDLE;
-    use winapi::um::wincon::ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    #[cfg(windows)]
+    {
+        use std::ptr::null_mut;
+        use winapi::um::consoleapi::GetConsoleMode;
+        use winapi::um::consoleapi::SetConsoleMode;
+        use winapi::um::processenv::GetStdHandle;
+        use winapi::um::winbase::STD_OUTPUT_HANDLE;
+        use winapi::um::wincon::ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
-    unsafe {
-        let handle = GetStdHandle(STD_OUTPUT_HANDLE);
-        if handle != null_mut() {
-            let mut mode = 0;
-            if GetConsoleMode(handle, &mut mode) != 0 {
-                SetConsoleMode(handle, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+        unsafe {
+            let handle = GetStdHandle(STD_OUTPUT_HANDLE);
+            if handle != null_mut() {
+                let mut mode = 0;
+                if GetConsoleMode(handle, &mut mode) != 0 {
+                    SetConsoleMode(handle, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+                }
             }
         }
     }
@@ -112,23 +149,7 @@ fn handle_file(input_path_string: &str, entry: &DirEntry) {
         .unwrap_or("");
 
     let extension = path.extension().and_then(|ext| ext.to_str()).unwrap_or("");
-    let expected_root_folders = match extension {
-        "tscn" => vec!["scenes".to_owned(), "globals".to_owned()],
-        "gd" => vec![
-            "scenes".to_owned(),
-            "globals".to_owned(),
-            "resources".to_owned(),
-            "test".to_owned()
-        ],
-        "tres" => vec!["resources".to_owned()],
-        "gdshader" => vec!["shaders".to_owned()],
-        "translation" => vec!["localization".to_owned()],
-        ext if is_image_extension(ext) => vec!["assets\\images".to_owned()],
-        ext if is_audio_extension(ext) => vec!["assets\\audio".to_owned()],
-        
-
-        _ => vec![],
-    };
+    
     let file_under_test = FileUnderTest {
         file_name: file_name.to_owned(),
         path: path.to_owned(),
@@ -139,27 +160,15 @@ fn handle_file(input_path_string: &str, entry: &DirEntry) {
             .to_str()
             .unwrap_or("")
             .to_owned(),
-        relative_path: full_path
+        relative_path: format!("./{}", full_path
             .strip_prefix(input_path_string)
             .unwrap_or(file_name)
-            .to_owned(),
-        expected_root_folders,
+            .replace('\\', "/")
+            .trim_start_matches('/')
+            .to_owned())
     };
+        
     validate_file(file_under_test, extension)
-}
-
-fn is_image_extension(ext: &str) -> bool {
-    matches!(
-        ext.to_lowercase().as_str(),
-        "png" | "jpg" | "jpeg" | "gif" | "webp" | "ico"
-    )
-}
-
-fn is_audio_extension(ext: &str) -> bool {
-    matches!(
-        ext.to_lowercase().as_str(),
-        "mp3" | "wav" | "ogg" | "flac" | "aac" | "m4a"
-    )
 }
 
 fn validate_file(file: FileUnderTest, extension: &str) {
@@ -185,6 +194,15 @@ fn validate_file(file: FileUnderTest, extension: &str) {
 }
 
 fn validate_parent_has_same_name(file: &FileUnderTest) {
+    // Check if this file should be skipped for parent name validation
+    for pattern in CONFIG.ignore_patterns.parent_has_same_name.iter() {
+        if let Ok(pattern) = Pattern::new(pattern) {
+            if pattern.matches(&file.relative_path) {
+                return;
+            }
+        }
+    }
+
     let parent_option = file.path.parent();
     let mut has_parent_with_same_name = false;
     if parent_option.is_some() {
@@ -212,19 +230,27 @@ fn validate_parent_has_same_name(file: &FileUnderTest) {
 }
 
 fn should_skip_file(file: &FileUnderTest) -> bool {
-    return file.relative_path.starts_with("\\export")
-        || file.relative_path.starts_with("\\.")
-        || file.relative_path.starts_with("\\addons")
-        || file.file_name == "default_bus_layout.tres"
-        || file.file_name == "default_theme.tres"
-        || file.extension == "tmp"
-        || file.extension == "import"
-        || file.extension == "exe"
-        || file.extension == "uid"
-        || file.file_name.starts_with(".");
+    println!("{}", &file.relative_path);
+    for pattern in IGNORE_PATTERNS.iter() {
+        println!("{} vs {}", &file.relative_path, pattern.as_str());
+        if pattern.matches(&file.relative_path) {
+            println!("Matched pattern");
+            return true;
+        }
+    }
+    false
 }
 
 fn validate_scene_nodes(file: FileUnderTest) {
+    // Check if this file should be skipped for scene node validation
+    for pattern in CONFIG.ignore_patterns.scene_nodes_pascal_case.iter() {
+        if let Ok(pattern) = Pattern::new(pattern) {
+            if pattern.matches(&file.relative_path) {
+                return;
+            }
+        }
+    }
+
     let file_content = match std::fs::read_to_string(&file.absolute_path) {
         Ok(content) => content,
         Err(_) => return,
@@ -264,20 +290,29 @@ fn validate_scene_nodes(file: FileUnderTest) {
                     .unwrap_or(&node_name_to_test)
                     .to_owned();
             }
+
             // Replace any uppercase exceptions with their PascalCase equivalents
-            if let Some(pascal_case) = UPPERCASE_TO_PASCAL_CASE.get(node_name_to_test.as_str()) {
+            if let Some(pascal_case) = UPPERCASE_TO_PASCAL_CASE.get(&node_name_to_test) {
                 node_name_to_test = pascal_case.to_string();
             }
+
+            let is_valid = if CONFIG.allow_screaming_snake_case_in_node_names {
+                node_name_to_test.is_pascal_case() || (node_name_to_test.is_snake_case() && node_name_to_test.chars().all(|c| !c.is_lowercase()))
+            } else {
+                node_name_to_test.is_pascal_case()
+            };
+
             handle_validation_result(
-                node_name_to_test.is_pascal_case(),
+                is_valid,
                 "rule-scene-nodes-pascal-case".to_owned(),
                 format!(
-                    "Used PascalCase naming-convention for node {} in scene '{}'",
+                    "Used correct naming-convention for node {} in scene '{}'",
                     node_name.bold(),
                     file.file_name.bold()
                 ),
                 format!(
-                    "Expected PascalCase naming-convention, but was {} in filename for '{}'",
+                    "Expected PascalCase{} naming-convention, but was {} in filename for '{}'",
+                    if CONFIG.allow_screaming_snake_case_in_node_names { " or SCREAMING_SNAKE_CASE" } else { "" },
                     node_name.bold(),
                     file.file_name.bold()
                 ),
@@ -287,42 +322,79 @@ fn validate_scene_nodes(file: FileUnderTest) {
 }
 
 fn validate_name(file: &FileUnderTest) {
+    // Check if this file should be skipped for filename validation
+    for pattern in CONFIG.ignore_patterns.filename_snake_case.iter() {
+        if let Ok(pattern) = Pattern::new(pattern) {
+            if pattern.matches(&file.relative_path) {
+                return;
+            }
+        }
+    }
+
+    let is_valid = file.file_name.is_snake_case() && file.file_name.chars().all(|c| !c.is_uppercase());
+    
     handle_validation_result(
-        file.file_name.is_snake_case(),
+        is_valid,
         "rule-filename-snake-case".to_owned(),
         format!(
-            "Used snake_case naming-convention in filename for '{}'",
+            "{} uses correct lowercase snake_case naming convention",
             file.file_name.bold()
         ),
         format!(
-            "Expected snake_case naming-convention in filename, but was '{}'",
+            "Expected lowercase snake_case for {}, but got {}",
+            file.file_name.bold(),
             file.file_name.bold()
         ),
     );
 }
 
 fn validate_file_root(file: &FileUnderTest) {
-    if file.expected_root_folders.is_empty() {
+    // Check if this file should be skipped for location validation
+    for pattern in CONFIG.ignore_patterns.allowed_file_location.iter() {
+        if let Ok(pattern) = Pattern::new(pattern) {
+            if pattern.matches(&file.relative_path) {
+                return;
+            }
+        }
+    }
+
+    // Find matching pattern for this file type
+    let mut matched_locations = Vec::new();
+    for (pattern, locations) in CONFIG.allowed_file_locations.iter() {
+        if let Ok(glob_pattern) = Pattern::new(pattern) {
+            if glob_pattern.matches(&file.relative_path) {
+                matched_locations.extend(locations.iter().cloned());
+            }
+        }
+    }
+
+    if matched_locations.is_empty() {
         return;
     }
+
     let relative_path = file
         .relative_path
         .strip_prefix("\\")
         .unwrap_or(&file.relative_path);
 
-    let in_correct_root = file
-        .expected_root_folders
+    let in_correct_root = matched_locations
         .iter()
-        .any(|folder| relative_path.starts_with(folder));
+        .any(|loc| {
+            let clean_loc = loc.strip_prefix("./").unwrap_or(loc);
+            relative_path.starts_with(clean_loc)
+        });
 
-    let folders_list = file.expected_root_folders.join(" or \\");
+    let folders_list = matched_locations.join(" or ");
 
     handle_validation_result(
         in_correct_root,
         "rule-allowed-file-location".to_owned(),
-        format!("Found {} in correct location", file.file_name.bold()),
         format!(
-            "Expected {} to be in \\{} directory, but was instead in {}",
+            "Found {} in correct location",
+            file.file_name.bold()
+        ),
+        format!(
+            "Expected {} to be in {} but found it in {}",
             file.file_name.bold(),
             folders_list.bold(),
             file.relative_path.bold()
@@ -347,6 +419,7 @@ fn handle_validation_result(is_success: bool, rule_name: String, success_message
 
 fn visit_dirs(path_string: &str, dir: &Path, cb: &dyn Fn(&str, &DirEntry)) -> io::Result<()> {
     if dir.is_dir() {
+        
         for entry in read_dir(dir)? {
             let entry = entry?;
             let path = entry.path();

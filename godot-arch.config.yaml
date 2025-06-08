@@ -1,9 +1,11 @@
 # File patterns listed here will be ignored
 ignorePatterns:
     overall:
+        - ./**
         - ./godot-arch.exe
         - ./godot-arch.config.yaml
         - ./addons/**
+        - ./target/**
     "rule-allowed-file-location":
     "rule-filename-snake-case":
     "rule-parent-has-same-name":
@@ -22,7 +24,7 @@ allowedFileLocations:
         - ./assets/images/**
     "**/*.{mp3,wave,ogg,flac,aac,m4a}":
         - ./assets/images/** 
-    "**/*.{.translation}":
+    "**/*.{translation}":
         - ./translations/**
 
 # Tests check wether or not a node is written in PascalCase, but
