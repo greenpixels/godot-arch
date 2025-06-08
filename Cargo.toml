@@ -1,0 +1,10 @@
+[package]
+name = "godot-arch"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+colored = "3.0.0"
+inflections = "1.1.1"
+rust-ini = "0.21.1"
+winapi = { version = "0.3", features = ["consoleapi", "processenv", "wincon", "handleapi", "winbase"] }
