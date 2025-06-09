@@ -80,7 +80,7 @@ jobs:
         with:
           name: godot-arch-linux
       - name: 
-        run: tar xf godot-arch-linux.tar.gz -C /test_projects/project_a/
+        run: tar xf ./godot-arch-linux/godot-arch-linux.tar.gz -C ./test_projects/project_a/
       - name: Run GodotArch for Test-Project A
         run: ./test_projects/project_a/godot-arch
 
