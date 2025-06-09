@@ -46,8 +46,8 @@ These are the default rules that GodotArch checks for. You can of course customi
 - **MUST** be in `(ROOT)/localization/**`
 
 ### Assets
-- Images (.png, .jpg, etc.) **MUST** be in `(ROOT)/assets/images/**`
-- Audio (.wav, .ogg, etc.) **MUST** be in `(ROOT)/assets/audio/**`
+- Images (.png, .jpg, .jpeg, .gif, .webp, .ico) **MUST** be in `(ROOT)/assets/images/**`
+- Audio (.mp3, .wave, .ogg, .flac, .aac, .m4a) **MUST** be in `(ROOT)/assets/audio/**`
 
 ### Nodes
 - Nodes ...
@@ -116,6 +116,17 @@ allowScreamingSnakeCaseInNodeNames: false
 ```
 
 Alternatively, you can add specific scenes to the ignore patterns if they contain translation keys.
+
+### shouldPrintSuccess
+
+Controls whether successful rule checks should print output:
+
+```yaml
+# Set to true to see output for passing checks
+shouldPrintSuccess: true
+```
+
+When enabled, this will show confirmations for files that pass the linting rules, not just errors.
 
 ## Planned Features
 
