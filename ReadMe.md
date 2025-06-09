@@ -1,19 +1,28 @@
 ![GodotArch](assets/images/godot-arch-logo.png)
 
+> 🚧👷‍♂️ **Please Note:** GodotArch is still in early development. Please report any bugs and issues you find.
+
 An extremely fast project structure linter four your Godot projects. GodotArch enforces consistent file organization and naming conventions across your Godot projects, making them more maintainable and easier to navigate. 
 
-It can check scenes, scripts, nodes, assets, and more. It is also extremely configurable via its `godot-arch.config.yaml`
+It can check scenes, scripts, nodes, assets, and more. It is also extremely configurable via its `godot-arch.config.yaml`. Check out the **Rules**-Section for more information.
 
 ## How To Use
 
 In order to use GodotArch you need to have its executable and configuration inside your project root.
+### 1. Requirements
+- A Godot project developed with `Godot 4.4` or higher 
+
+### 2. Installation & Setup
 - Download the latest release 
 - Unpack the contents into your project-root (`godot-arch.config.yaml` and `godot-arch`)
 - (*optional*) customize the configuration in `godot-arch.config.yaml`
+### 3. Usage
 - Execute  `godot-arch` either locally in your terminal or preferrably in your CI via e.g. GitHub-Actions
 
-## Rules
+### Requirements
 
+## Rules
+These are the default rules that GodotArch checks for. You can of course customize that behaviour via `godot-arch.config.yaml`, but it is recommended to adhere to these defaults. They are a mix of examples in the Godot Documentation and its best-pratices, aswell as inspired by different Godot projects I have seen over times.
 ### Files
 - **MUST** have filename in `snake_case`
 
@@ -52,6 +61,7 @@ The `godot-arch.config.yaml` file allows you to customize the linter's behavior.
 ### ignorePatterns
 
 Specify file patterns to be ignored by the linter:
+>  🚨 **Please note:** All patterns in this configuration need to begin with `./`
 
 ```yaml
 ignorePatterns:
@@ -70,6 +80,7 @@ ignorePatterns:
 ### allowedFileLocations
 
 Define where specific file types are allowed to be located:
+>  🚨 **Please note:** All patterns in this configuration need to begin with `./`
 
 ```yaml
 allowedFileLocations:
@@ -95,9 +106,9 @@ nodeNamePascalCaseExceptions:
     # etc...
 ```
 
-### Translation Key Names
+### allowScreamingSnakeCaseInNodeNames
 
-If your project uses translation keys in node names (e.g., in TabContainer children):
+If your project uses translation keys as node names (e.g., childrne of *TabContainer*):
 
 ```yaml
 # Set to true if you use SCREAMING_SNAKE_CASE for translation keys in node names
