@@ -43,6 +43,9 @@ struct IgnorePatterns {
     #[serde(rename = "rule-scene-nodes-pascal-case")]
     #[serde(default)]
     scene_nodes_pascal_case: Vec<String>,
+    #[serde(rename = "rule-root-node-is-file-name-pascal")]
+    #[serde(default)]
+    root_node_is_file_name_pascal: Vec<String>,
 }
 
 static mut VALIDATION_COUNT: i32 = 0;
@@ -243,10 +246,21 @@ fn should_skip_file(file: &FileUnderTest) -> bool {
 
 fn validate_scene_nodes(file: FileUnderTest) {
     // Check if this file should be skipped for scene node validation
+    let mut should_check_scene_nodes_pascal_case = true;
+    let mut should_check_root_node_is_file_name_pascal = true;
     for pattern in CONFIG.ignore_patterns.scene_nodes_pascal_case.iter() {
         if glob_match(pattern, &file.relative_path) {
-            return;
+            should_check_scene_nodes_pascal_case = false;
         }
+    }
+    for pattern in CONFIG.ignore_patterns.root_node_is_file_name_pascal.iter() {
+        if glob_match(pattern, &file.relative_path) {
+            should_check_root_node_is_file_name_pascal = false;
+        }
+    }
+
+    if !should_check_scene_nodes_pascal_case && !should_check_root_node_is_file_name_pascal {
+        return;
     }
 
     let file_content = match std::fs::read_to_string(&file.absolute_path) {
@@ -254,6 +268,7 @@ fn validate_scene_nodes(file: FileUnderTest) {
         Err(_) => return,
     };
 
+    let mut is_root_node = true;
     for line in file_content.lines() {
         if !line.starts_with('[') || !line.ends_with(']') {
             continue;
@@ -276,48 +291,70 @@ fn validate_scene_nodes(file: FileUnderTest) {
             };
 
             let node_name = value.replace("\"", "");
-            let mut node_name_to_test = node_name.to_owned();
-            if node_name_to_test.ends_with("2D") {
-                node_name_to_test = node_name_to_test
-                    .strip_suffix("2D")
-                    .unwrap_or(&node_name_to_test)
-                    .to_owned();
-            } else if node_name.ends_with("3D") {
-                node_name_to_test = node_name_to_test
-                    .strip_suffix("3D")
-                    .unwrap_or(&node_name_to_test)
-                    .to_owned();
+            if is_root_node && should_check_root_node_is_file_name_pascal {
+                is_root_node = false;
+                let file_name_as_pascal_case = file
+                    .file_name
+                    .replace(&format!(".{}", file.extension).to_string(), "")
+                    .to_pascal_case();
+                let root_node_has_same_name = file_name_as_pascal_case == node_name;
+                handle_validation_result(
+                    root_node_has_same_name,
+                    "rule-root-node-is-file-name-pascal".to_owned(),
+                    format!(
+                        "Root node of {} is {}",
+                        file.file_name, file_name_as_pascal_case
+                    ),
+                    format!(
+                        "Expected root node of {} to be {}, but was {}",
+                        file.file_name, file_name_as_pascal_case, node_name
+                    ),
+                );
             }
+            if should_check_scene_nodes_pascal_case {
+                let mut node_name_to_test = node_name.to_owned();
+                if node_name_to_test.ends_with("2D") {
+                    node_name_to_test = node_name_to_test
+                        .strip_suffix("2D")
+                        .unwrap_or(&node_name_to_test)
+                        .to_owned();
+                } else if node_name.ends_with("3D") {
+                    node_name_to_test = node_name_to_test
+                        .strip_suffix("3D")
+                        .unwrap_or(&node_name_to_test)
+                        .to_owned();
+                }
 
-            for (uppercase, pascal_case) in UPPERCASE_TO_PASCAL_CASE.iter() {
-                node_name_to_test = node_name_to_test.replace(uppercase, pascal_case);
+                for (uppercase, pascal_case) in UPPERCASE_TO_PASCAL_CASE.iter() {
+                    node_name_to_test = node_name_to_test.replace(uppercase, pascal_case);
+                }
+
+                let mut is_valid = node_name_to_test.is_pascal_case();
+                if CONFIG.allow_screaming_snake_case_in_node_names && !is_valid {
+                    is_valid = node_name_to_test.is_upper_case()
+                        && node_name_to_test.to_lowercase().is_snake_case();
+                }
+
+                handle_validation_result(
+                    is_valid,
+                    "rule-scene-nodes-pascal-case".to_owned(),
+                    format!(
+                        "Used correct naming-convention for node {} in scene '{}'",
+                        node_name.bold(),
+                        file.file_name.bold()
+                    ),
+                    format!(
+                        "Expected PascalCase{} naming-convention, but was {} in filename for '{}'",
+                        if CONFIG.allow_screaming_snake_case_in_node_names {
+                            " or SCREAMING_SNAKE_CASE"
+                        } else {
+                            ""
+                        },
+                        node_name.bold(),
+                        file.file_name.bold()
+                    ),
+                );
             }
-
-            let mut is_valid = node_name_to_test.is_pascal_case();
-            if CONFIG.allow_screaming_snake_case_in_node_names && !is_valid {
-                is_valid = node_name_to_test.is_upper_case() && node_name_to_test.to_lowercase().is_snake_case();
-            }
-
-
-            handle_validation_result(
-                is_valid,
-                "rule-scene-nodes-pascal-case".to_owned(),
-                format!(
-                    "Used correct naming-convention for node {} in scene '{}'",
-                    node_name.bold(),
-                    file.file_name.bold()
-                ),
-                format!(
-                    "Expected PascalCase{} naming-convention, but was {} in filename for '{}'",
-                    if CONFIG.allow_screaming_snake_case_in_node_names {
-                        " or SCREAMING_SNAKE_CASE"
-                    } else {
-                        ""
-                    },
-                    node_name.bold(),
-                    file.file_name.bold()
-                ),
-            );
         }
     }
 }

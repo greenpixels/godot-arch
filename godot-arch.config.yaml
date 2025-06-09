@@ -11,10 +11,12 @@ ignorePatterns:
         - ./.godot
         - ./**/*.uid
         - ./**/*.tmp
+
     "rule-allowed-file-location":
     "rule-filename-snake-case":
     "rule-parent-has-same-name":
     "rule-scene-nodes-pascal-case":
+    "rule-root-node-is-file-name-pascal":
 
 # Tests whether the given file pattern matches its pattern list
 # This means you can allow .tscn files only in a specific location

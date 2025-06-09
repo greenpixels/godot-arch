@@ -21,7 +21,7 @@ In order to use GodotArch you need to have its executable and configuration insi
 
 ### Requirements
 
-## Rules
+## Checks and Default Rules
 These are the default rules that GodotArch checks for. You can of course customize that behaviour via `godot-arch.config.yaml`, but it is recommended to adhere to these defaults. They are a mix of examples in the Godot Documentation and its best-pratices, aswell as inspired by different Godot projects I have seen over times.
 ### Files
 - **MUST** have filename in `snake_case`
@@ -69,12 +69,13 @@ ignorePatterns:
         - ./godot-arch.exe
         - ./addons/**
         - ...
-    # You can also ignore files for specific rules
-    "rule-allowed-file-location":
+
+    # You can also ignore files for specific rules via glob patterns here:
+    "rule-allowed-file-location": # <- Checks the file path against allowedFileLocations
         - ./my_example_file.tscn
-    "rule-filename-snake-case":
-    "rule-parent-has-same-name":
-    "rule-scene-nodes-pascal-case":
+    "rule-filename-snake-case": # <- Checks whether the filename is written in snake_case
+    "rule-parent-has-same-name": # <- Checks whether the parent folder has the same name as the file (e.g ./player/player.gd)
+    "rule-scene-nodes-pascal-case": # <- Checks whether all nodes are in PascalCase
 ```
 
 ### allowedFileLocations
