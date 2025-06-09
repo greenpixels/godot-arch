@@ -289,9 +289,8 @@ fn validate_scene_nodes(file: FileUnderTest) {
                     .to_owned();
             }
 
-            // Replace any uppercase exceptions with their PascalCase equivalents
-            if let Some(pascal_case) = UPPERCASE_TO_PASCAL_CASE.get(&node_name_to_test) {
-                node_name_to_test = pascal_case.to_string();
+            for (uppercase, pascal_case) in UPPERCASE_TO_PASCAL_CASE.iter() {
+                node_name_to_test = node_name_to_test.replace(uppercase, pascal_case);
             }
 
             let mut is_valid = node_name_to_test.is_pascal_case();

@@ -10,6 +10,7 @@ ignorePatterns:
         - ./.github
         - ./.godot
         - ./**/*.uid
+        - ./**/*.tmp
     "rule-allowed-file-location":
     "rule-filename-snake-case":
     "rule-parent-has-same-name":
@@ -50,8 +51,8 @@ nodeNamePascalCaseExceptions:
     - VScrollBar: VerticalScrollBar
     - HSlider: HorizontalSlider
     - VSlider: VerticalSlider
-    - HSeperator: HorizontalSeperator
-    - VSeperator: VerticalSeperator
+    - HSeparator: HorizontalSeperator
+    - VSeparator: VerticalSeperator
     - CPU: Cpu
     - VoxelGI: VoxelGlobalIllumination
     - LightmapGI: LightmapGlobalIllumination
