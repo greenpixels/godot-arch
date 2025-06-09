@@ -3,7 +3,7 @@ projectPath: .
 # File patterns listed here will be ignored
 ignorePatterns:
     overall:
-        - ./godot-arch.exe
+        - ./godot-arch*
         - ./godot-arch.config.yaml
         - ./addons/**
         - ./export/**
