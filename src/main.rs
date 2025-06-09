@@ -1,5 +1,5 @@
 use colored::Colorize;
-use glob::Pattern;
+use glob_match::glob_match;
 use inflections::Inflect;
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -62,13 +62,8 @@ lazy_static::lazy_static! {
             }
         }
         m
-    };
-
-    static ref IGNORE_PATTERNS: Vec<Pattern> = {
-        CONFIG.ignore_patterns.overall
-            .iter()
-            .filter_map(|p| Pattern::new(p).ok())
-            .collect()
+    };    static ref IGNORE_PATTERNS: Vec<String> = {
+        CONFIG.ignore_patterns.overall.clone()
     };
 }
 
@@ -199,10 +194,8 @@ fn validate_file(file: FileUnderTest, extension: &str) {
 fn validate_parent_has_same_name(file: &FileUnderTest) {
     // Check if this file should be skipped for parent name validation
     for pattern in CONFIG.ignore_patterns.parent_has_same_name.iter() {
-        if let Ok(pattern) = Pattern::new(pattern) {
-            if pattern.matches(&file.relative_path) {
-                return;
-            }
+        if glob_match(pattern, &file.relative_path) {
+            return;
         }
     }
 
@@ -241,21 +234,14 @@ fn normalize_path(path: &str) -> String {
 }
 
 fn should_skip_file(file: &FileUnderTest) -> bool {
-    for pattern in IGNORE_PATTERNS.iter() {
-        if pattern.matches(&file.relative_path) {
-            return true;
-        }
-    }
-    false
+    IGNORE_PATTERNS.iter().any(|pattern| glob_match(pattern, &file.relative_path))
 }
 
 fn validate_scene_nodes(file: FileUnderTest) {
     // Check if this file should be skipped for scene node validation
     for pattern in CONFIG.ignore_patterns.scene_nodes_pascal_case.iter() {
-        if let Ok(pattern) = Pattern::new(pattern) {
-            if pattern.matches(&file.relative_path) {
-                return;
-            }
+        if glob_match(pattern, &file.relative_path) {
+            return;
         }
     }
 
@@ -338,10 +324,8 @@ fn validate_scene_nodes(file: FileUnderTest) {
 fn validate_name(file: &FileUnderTest) {
     // Check if this file should be skipped for filename validation
     for pattern in CONFIG.ignore_patterns.filename_snake_case.iter() {
-        if let Ok(pattern) = Pattern::new(pattern) {
-            if pattern.matches(&file.relative_path) {
-                return;
-            }
+        if glob_match(pattern, &file.relative_path) {
+            return;
         }
     }
 
@@ -366,36 +350,28 @@ fn validate_name(file: &FileUnderTest) {
 fn validate_file_root(file: &FileUnderTest) {
     // Check if this file should be skipped for location validation
     for pattern in CONFIG.ignore_patterns.allowed_file_location.iter() {
-        if let Ok(pattern) = Pattern::new(pattern) {
-            if pattern.matches(&file.relative_path) {
-                return;
-            }
+        if glob_match(pattern, &file.relative_path) {
+            return;
         }
     }
-
+    let mut in_correct_root = false;
+    let mut can_skip = true;
     // Find matching pattern for this file type
-    let mut matched_locations = Vec::new();
+    let mut matched_locations: Vec<String> = vec![];
     for (pattern, locations) in CONFIG.allowed_file_locations.iter() {
-        if let Ok(glob_pattern) = Pattern::new(pattern) {
-            if glob_pattern.matches(&file.relative_path) {
-                matched_locations.extend(locations.iter().cloned());
+         if glob_match(pattern, &file.relative_path) {
+            can_skip = false;
+            for location in locations {
+                matched_locations.push(location.to_owned());
+                if glob_match(location, &file.relative_path) {
+                    in_correct_root = true;
+                }
             }
         }
     }
-
-    if matched_locations.is_empty() {
-        return;
+    if can_skip {
+        return
     }
-
-    let in_correct_root = matched_locations.iter().any(|loc: &String| {
-        if let Ok(pattern) = Pattern::new(loc) {
-            if pattern.matches(&file.relative_path) {
-                return true;
-            }
-        }
-        false
-    });
-
     let folders_list = matched_locations.join(" or ");
 
     handle_validation_result(
@@ -443,10 +419,8 @@ fn visit_dirs(path_string: &str, dir: &Path, cb: &dyn Fn(&str, &DirEntry)) -> io
                 .unwrap_or(dir)
                 .to_str()
                 .unwrap_or(""),
-        );
-
-        for pattern in IGNORE_PATTERNS.iter() {
-            if pattern.matches(&normalized_path) {
+        );        for pattern in IGNORE_PATTERNS.iter() {
+            if glob_match(pattern, &normalized_path) {
                 return Ok(());
             }
         }

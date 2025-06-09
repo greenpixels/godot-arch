@@ -70,17 +70,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "glob"
-version = "0.3.2"
+name = "glob-match"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a8d1add55171497b4705a648c6b583acafb01d58050a51727785f0b2c8e0a2b2"
+checksum = "9985c9503b412198aa4197559e9a318524ebc4519c229bfa05a535828c950b9d"
 
 [[package]]
 name = "godot-arch"
 version = "0.1.0"
 dependencies = [
  "colored",
- "glob",
+ "glob-match",
  "inflections",
  "lazy_static",
  "rust-ini",
