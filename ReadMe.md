@@ -13,7 +13,7 @@ In order to use GodotArch you need to have its executable and configuration insi
 - A Godot project developed with `Godot 4.4` or higher 
 
 ### 2. Installation & Setup
-- Download the latest release 
+- [Download](https://github.com/greenpixels/godot-arch/releases) the latest release for your platform
 - Unpack the contents into your project-root (`godot-arch.config.yaml` and `godot-arch`)
 - (*optional*) customize the configuration in `godot-arch.config.yaml`
 ### 3. Usage

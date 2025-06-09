@@ -29,7 +29,7 @@ allowedFileLocations:
         - ./assets/images/**
     "./**/*.{mp3,wave,ogg,flac,aac,m4a}":
         - ./assets/audio/** 
-    "./**/*.{translation}":
+    "./**/*.translation":
         - ./localization/**
 
 # Tests check wether or not a node is written in PascalCase, but
