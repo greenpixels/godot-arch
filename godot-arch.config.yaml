@@ -9,6 +9,7 @@ ignorePatterns:
         - ./.git
         - ./.github
         - ./.godot
+        - ./**/*.uid
     "rule-allowed-file-location":
     "rule-filename-snake-case":
     "rule-parent-has-same-name":
@@ -58,3 +59,5 @@ nodeNamePascalCaseExceptions:
 # Some projects use translation keys in node names (e.g children of TabContainer) and have the translation keys as SCREAMING_SNAKE_CASE
 # If so, either add the hosting scene to ignorePatterns.overall, ignorePatterns.rule-scene-nodes-pascal-case or set this to true
 allowScreamingSnakeCaseInNodeNames: false
+
+shouldPrintSuccess: true

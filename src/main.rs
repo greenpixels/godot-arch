@@ -22,6 +22,9 @@ struct Config {
     #[serde(default)]
     #[serde(rename = "allowScreamingSnakeCaseInNodeNames")]
     allow_screaming_snake_case_in_node_names: bool,
+    #[serde(default)]
+    #[serde(rename = "shouldPrintSuccess")]
+    should_print_success: bool,
 }
 
 #[derive(Debug, Deserialize, Default)]
@@ -44,7 +47,6 @@ struct IgnorePatterns {
 
 static mut VALIDATION_COUNT: i32 = 0;
 static mut VALIDATION_FAILS: i32 = 0;
-const SHOULD_PRINT_SUCCESS: bool = true;
 
 lazy_static::lazy_static! {
     static ref CONFIG: Config = {
@@ -234,7 +236,9 @@ fn normalize_path(path: &str) -> String {
 }
 
 fn should_skip_file(file: &FileUnderTest) -> bool {
-    IGNORE_PATTERNS.iter().any(|pattern| glob_match(pattern, &file.relative_path))
+    IGNORE_PATTERNS
+        .iter()
+        .any(|pattern| glob_match(pattern, &file.relative_path))
 }
 
 fn validate_scene_nodes(file: FileUnderTest) {
@@ -290,13 +294,11 @@ fn validate_scene_nodes(file: FileUnderTest) {
                 node_name_to_test = pascal_case.to_string();
             }
 
-            let is_valid = if CONFIG.allow_screaming_snake_case_in_node_names {
-                node_name_to_test.is_pascal_case()
-                    || (node_name_to_test.is_snake_case()
-                        && node_name_to_test.chars().all(|c| !c.is_lowercase()))
-            } else {
-                node_name_to_test.is_pascal_case()
-            };
+            let mut is_valid = node_name_to_test.is_pascal_case();
+            if CONFIG.allow_screaming_snake_case_in_node_names && !is_valid {
+                is_valid = node_name_to_test.is_upper_case() && node_name_to_test.to_lowercase().is_snake_case();
+            }
+
 
             handle_validation_result(
                 is_valid,
@@ -359,7 +361,7 @@ fn validate_file_root(file: &FileUnderTest) {
     // Find matching pattern for this file type
     let mut matched_locations: Vec<String> = vec![];
     for (pattern, locations) in CONFIG.allowed_file_locations.iter() {
-         if glob_match(pattern, &file.relative_path) {
+        if glob_match(pattern, &file.relative_path) {
             can_skip = false;
             for location in locations {
                 matched_locations.push(location.to_owned());
@@ -370,7 +372,7 @@ fn validate_file_root(file: &FileUnderTest) {
         }
     }
     if can_skip {
-        return
+        return;
     }
     let folders_list = matched_locations.join(" or ");
 
@@ -394,7 +396,7 @@ fn handle_validation_result(
     error_message: String,
 ) {
     if is_success {
-        if SHOULD_PRINT_SUCCESS {
+        if CONFIG.should_print_success {
             println!(
                 "\t{} ({}): {}",
                 "Test Succesful".green(),
@@ -403,7 +405,12 @@ fn handle_validation_result(
             )
         }
     } else {
-        println!("\t{}: {}", "Test Failed".red(), error_message);
+        println!(
+            "\t{} ({}): {}",
+            "Test Failed".red(),
+            rule_name.bright_black(),
+            error_message
+        );
         unsafe {
             VALIDATION_FAILS += 1;
         }
@@ -419,7 +426,8 @@ fn visit_dirs(path_string: &str, dir: &Path, cb: &dyn Fn(&str, &DirEntry)) -> io
                 .unwrap_or(dir)
                 .to_str()
                 .unwrap_or(""),
-        );        for pattern in IGNORE_PATTERNS.iter() {
+        );
+        for pattern in IGNORE_PATTERNS.iter() {
             if glob_match(pattern, &normalized_path) {
                 return Ok(());
             }
