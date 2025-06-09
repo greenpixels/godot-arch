@@ -3,9 +3,8 @@ use glob_match::glob_match;
 use inflections::Inflect;
 use serde::Deserialize;
 use std::collections::HashMap;
-use std::env;
 use std::fs::{DirEntry, exists, read_dir};
-use std::io;
+use std::{env, io};
 use std::path::{Path, PathBuf};
 
 #[derive(Debug, Deserialize)]
@@ -25,6 +24,12 @@ struct Config {
     #[serde(default)]
     #[serde(rename = "shouldPrintSuccess")]
     should_print_success: bool,
+    #[serde(default)]
+    #[serde(rename = "projectPath")]
+    project_path : String,
+    #[serde(rename = "waitForInputBeforeClose")]
+    #[serde(default)]
+    wait_for_input_before_close  : bool,
 }
 
 #[derive(Debug, Deserialize, Default)]
@@ -45,7 +50,7 @@ struct IgnorePatterns {
     scene_nodes_pascal_case: Vec<String>,
     #[serde(rename = "rule-root-node-is-file-name-pascal")]
     #[serde(default)]
-    root_node_is_file_name_pascal: Vec<String>,
+    root_node_is_file_name_pascal: Vec<String>
 }
 
 static mut VALIDATION_COUNT: i32 = 0;
@@ -53,7 +58,15 @@ static mut VALIDATION_FAILS: i32 = 0;
 
 lazy_static::lazy_static! {
     static ref CONFIG: Config = {
-        let config_content = std::fs::read_to_string("godot-arch.config.yaml")
+        
+        let args: Vec<String> = env::args().collect();
+        let configuration_path: &str;
+        if args.len() > 1 {
+            configuration_path = &args[1];
+        } else {
+            configuration_path = "godot-arch.config.yaml";
+        }
+        let config_content = std::fs::read_to_string(configuration_path)
             .expect("Failed to read config file");
         serde_yaml::from_str(&config_content)
             .expect("Failed to parse config file")
@@ -106,13 +119,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     enable_ansi_support();
     let start_time = std::time::Instant::now();
 
-    let args: Vec<String> = env::args().collect();
-    let path_string: &str;
-    if args.len() > 1 {
-        path_string = &args[1];
-    } else {
-        path_string = ".";
-    }
+
+    let path_string: &str = CONFIG.project_path.as_str();
     let path = Path::new(path_string);
 
     if !exists(path).is_ok() {
@@ -130,9 +138,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let elapsed_time = start_time.elapsed();
     println!("Total execution time: {:.2?}", elapsed_time);
+    if CONFIG.wait_for_input_before_close {
+        println!("\nPress any button to exit ...");
+        io::stdin().read_line(&mut String::new()).unwrap();
+    }
 
-    println!("\nPress any button to exit ...");
-    io::stdin().read_line(&mut String::new()).unwrap();
 
     if unsafe { VALIDATION_FAILS != 0 } {
         return Err("Some tests were not succesful".into());

@@ -1,3 +1,5 @@
+projectPath: .
+
 # File patterns listed here will be ignored
 ignorePatterns:
     overall:
@@ -27,12 +29,15 @@ allowedFileLocations:
     "./**/*.gd":
         - ./globals/**
         - ./scenes/**
+        - ./resources/**
     "./**/*.gdshader":
         - ./shaders/**
     "./**/*.{png,jpg,jpeg,gif,webp,ico}":
         - ./assets/images/**
     "./**/*.{mp3,wave,ogg,flac,aac,m4a}":
         - ./assets/audio/** 
+    "./**/*.{ttf}":
+        - ./assets/fonts/**
     "./**/*.translation":
         - ./localization/**
 
@@ -64,3 +69,4 @@ nodeNamePascalCaseExceptions:
 allowScreamingSnakeCaseInNodeNames: false
 
 shouldPrintSuccess: true
+waitForInputBeforeClose: false
