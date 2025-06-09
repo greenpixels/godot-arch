@@ -5,8 +5,18 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  release:
+    types: [created]
 
 jobs:
+  delete-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: kolpav/purge-artifacts-action@v1
+        with:
+          token: ${{ secrets.PAT }}
+          expire-in: 3days 
+          
   build-linux:
     runs-on: ubuntu-latest
     steps:
@@ -58,3 +68,27 @@ jobs:
         with:
           name: godot-arch-windows
           path: godot-arch-windows.zip
+
+  create-release:
+    needs: [build-linux, build-windows]
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: godot-arch-linux
+          
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: godot-arch-windows
+
+      - name: Upload Release Assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} godot-arch-linux.tar.gz
+          gh release upload ${{ github.event.release.tag_name }} godot-arch-windows.zip
