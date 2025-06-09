@@ -1,24 +1,60 @@
-# .github/workflows/release.yml
+name: Build and Bundle
 
 on:
-  release:
-    types: [created]
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  release:
-    name: release ${{ matrix.target }}
+  build-linux:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        target: [x86_64-pc-windows-gnu, x86_64-unknown-linux-musl]
     steps:
-      - uses: actions/checkout@master
-      - name: Compile and release
-        uses: W4ff1e/rust-build.action@9e45af469b0e54cca636a2aecfa3f285ee4d25f0
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build for Linux
+        run: cargo build --release
+
+      - name: Prepare files
+        run: |
+          mkdir bundle
+          cp target/release/godot-arch bundle/
+          cp godot-arch.config.yaml bundle/
+
+      - name: Create tar.gz archive
+        run: tar -czvf godot-arch-linux.tar.gz -C bundle .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          RUSTTARGET: ${{ matrix.target }}
-          EXTRA_FILES: "godot-arch.config.yaml"
-          TOOLCHAIN_VERSION: stable
+          name: godot-arch-linux
+          path: godot-arch-linux.tar.gz
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build for Windows
+        run: cargo build --release
+
+      - name: Prepare files
+        run: |
+          mkdir bundle
+          copy target\release\godot-arch.exe bundle\
+          copy godot-arch.config.yaml bundle\
+
+      - name: Create zip archive
+        run: Compress-Archive -Path bundle\* -DestinationPath godot-arch-windows.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-arch-windows
+          path: godot-arch-windows.zip
