@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bnj17dcxc54de"]
+
+[ext_resource type="Script" uid="uid://r0ad2lmaix1q" path="res://scenes/enemy/snake/snake.gd" id="1_ypls6"]
+
+[node name="Snake" type="Node2D"]
+script = ExtResource("1_ypls6")
