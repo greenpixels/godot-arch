@@ -1,14 +1,16 @@
 ![GodotArch](assets/images/godot-arch-logo.png)
 
-An executable that lints project structure in your Godot project. GodotArch helps enforce consistent organization and naming conventions across your Godot projects, making them more maintainable and easier to navigate.
+An extremely fast project structure linter four your Godot projects. GodotArch enforces consistent file organization and naming conventions across your Godot projects, making them more maintainable and easier to navigate. 
 
-## Installation
+It can check scenes, scripts, nodes, assets, and more. It is also extremely configurable via its `godot-arch.config.yaml`
 
-Currently, you can only build from source (until a proper stable release is published):
-```bash
-cargo build --release
-```
-The executable will be available in `target/release/godot-arch`.
+## How To Use
+
+In order to use GodotArch you need to have its executable and configuration inside your project root.
+- Download the latest release 
+- Unpack the contents into your project-root (`godot-arch.config.yaml` and `godot-arch`)
+- (*optional*) customize the configuration in `godot-arch.config.yaml`
+- Execute  `godot-arch` either locally in your terminal or preferrably in your CI via e.g. GitHub-Actions
 
 ## Rules
 
@@ -42,6 +44,67 @@ The executable will be available in `target/release/godot-arch`.
 - Nodes ...
     - **MUST** have their name in *PascalCase*
     - This helps maintain consistency with Godot's built-in node naming conventions
+
+## Configuration
+
+The `godot-arch.config.yaml` file allows you to customize the linter's behavior. Here are the main configuration sections:
+
+### ignorePatterns
+
+Specify file patterns to be ignored by the linter:
+
+```yaml
+ignorePatterns:
+    overall:  # Ignored by all rules
+        - ./godot-arch.exe
+        - ./addons/**
+        - ...
+    # You can also ignore files for specific rules
+    "rule-allowed-file-location":
+        - ./my_example_file.tscn
+    "rule-filename-snake-case":
+    "rule-parent-has-same-name":
+    "rule-scene-nodes-pascal-case":
+```
+
+### allowedFileLocations
+
+Define where specific file types are allowed to be located:
+
+```yaml
+allowedFileLocations:
+    "./**/*.tscn":  # Scene files
+        - ./globals/**
+        - ./scenes/**
+    "./**/*.gd":    # Script files
+        - ./globals/**
+        - ./scenes/**
+    "./**/*.{png,jpg,jpeg,gif,webp,ico}":  # Image files
+        - ./assets/images/**
+```
+
+### nodeNamePascalCaseExceptions
+
+Configure exceptions for node naming conventions, especially useful for standard Godot nodes that don't follow PascalCase.
+
+```yaml
+nodeNamePascalCaseExceptions:
+    - GPU: Gpu
+    - VBoxContainer: VerticalBoxContainer
+    - HBoxContainer: HorizontalBoxContainer
+    # etc...
+```
+
+### Translation Key Names
+
+If your project uses translation keys in node names (e.g., in TabContainer children):
+
+```yaml
+# Set to true if you use SCREAMING_SNAKE_CASE for translation keys in node names
+allowScreamingSnakeCaseInNodeNames: false
+```
+
+Alternatively, you can add specific scenes to the ignore patterns if they contain translation keys.
 
 ## Planned Features
 

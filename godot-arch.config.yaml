@@ -14,26 +14,28 @@ ignorePatterns:
     "rule-parent-has-same-name":
     "rule-scene-nodes-pascal-case":
 
+# Tests whether the given file pattern matches its pattern list
+# This means you can allow .tscn files only in a specific location
 allowedFileLocations:
-    "**/*.tscn":
+    "./**/*.tscn":
         - ./globals/**
         - ./scenes/**
-    "**/*.gd":
+    "./**/*.gd":
         - ./globals/**
         - ./scenes/**
-    "**/*.gdshader":
+    "./**/*.gdshader":
         - ./shaders/**
-    "**/*.{png,jpg,jpeg,gif,webp,ico}":
+    "./**/*.{png,jpg,jpeg,gif,webp,ico}":
         - ./assets/images/**
-    "**/*.{mp3,wave,ogg,flac,aac,m4a}":
-        - ./assets/images/** 
-    "**/*.{translation}":
-        - ./translations/**
+    "./**/*.{mp3,wave,ogg,flac,aac,m4a}":
+        - ./assets/audio/** 
+    "./**/*.{translation}":
+        - ./localization/**
 
 # Tests check wether or not a node is written in PascalCase, but
 # some standard Godot nodes don't adhere to that rule. We add exceptions and remaps for these cases.
 # This does not rename your nodes, it just helps the test to pass
-partialNodeNameRewrites:
+nodeNamePascalCaseExceptions:
     - GPU: Gpu
     - URL: Url
     - HTTP: Http

@@ -1,12 +1,12 @@
 use colored::Colorize;
+use glob::Pattern;
 use inflections::Inflect;
+use serde::Deserialize;
+use std::collections::HashMap;
 use std::env;
 use std::fs::{DirEntry, exists, read_dir};
 use std::io;
 use std::path::{Path, PathBuf};
-use serde::Deserialize;
-use std::collections::HashMap;
-use glob::Pattern;
 
 #[derive(Debug, Deserialize)]
 struct Config {
@@ -17,8 +17,8 @@ struct Config {
     #[serde(rename = "allowedFileLocations")]
     allowed_file_locations: HashMap<String, Vec<String>>,
     #[serde(default)]
-    #[serde(rename = "partialNodeNameRewrites")]
-    partial_node_name_rewrites: Vec<HashMap<String, String>>,
+    #[serde(rename = "nodeNamePascalCaseExceptions")]
+    node_name_pascal_case_exceptions: Vec<HashMap<String, String>>,
     #[serde(default)]
     #[serde(rename = "allowScreamingSnakeCaseInNodeNames")]
     allow_screaming_snake_case_in_node_names: bool,
@@ -56,7 +56,7 @@ lazy_static::lazy_static! {
 
     static ref UPPERCASE_TO_PASCAL_CASE: HashMap<String, String> = {
         let mut m = HashMap::new();
-        for rewrite in &CONFIG.partial_node_name_rewrites {
+        for rewrite in &CONFIG.node_name_pascal_case_exceptions {
             for (k, v) in rewrite {
                 m.insert(k.clone(), v.clone());
             }
@@ -149,7 +149,7 @@ fn handle_file(input_path_string: &str, entry: &DirEntry) {
         .unwrap_or("");
 
     let extension = path.extension().and_then(|ext| ext.to_str()).unwrap_or("");
-    
+
     let file_under_test = FileUnderTest {
         file_name: file_name.to_owned(),
         path: path.to_owned(),
@@ -163,10 +163,10 @@ fn handle_file(input_path_string: &str, entry: &DirEntry) {
         relative_path: normalize_path(
             full_path
                 .strip_prefix(input_path_string)
-                .unwrap_or(file_name)
-        )
+                .unwrap_or(file_name),
+        ),
     };
-        
+
     validate_file(file_under_test, extension)
 }
 
@@ -174,7 +174,11 @@ fn validate_file(file: FileUnderTest, extension: &str) {
     if should_skip_file(&file) {
         return;
     }
-    println!("\n\n>> Testing {} in {}...", file.file_name.yellow(), file.relative_path.yellow());
+    println!(
+        "\n\n>> Testing {} in {}...",
+        file.file_name.yellow(),
+        file.relative_path.yellow()
+    );
     validate_file_root(&file);
     validate_name(&file);
     match extension {
@@ -209,7 +213,8 @@ fn validate_parent_has_same_name(file: &FileUnderTest) {
         let parent_file_name_option = parent.file_name();
         if parent_file_name_option.is_some() {
             let file_name = parent_file_name_option.unwrap().to_str().unwrap_or("");
-            has_parent_with_same_name = format!("{}.{}", file_name, file.extension) == file.file_name
+            has_parent_with_same_name =
+                format!("{}.{}", file_name, file.extension) == file.file_name
         }
     }
 
@@ -229,10 +234,10 @@ fn validate_parent_has_same_name(file: &FileUnderTest) {
 }
 
 fn normalize_path(path: &str) -> String {
-    format!("./{}", path
-        .replace('\\', "/")
-        .trim_start_matches('/')
-        .to_owned())
+    format!(
+        "./{}",
+        path.replace('\\', "/").trim_start_matches('/').to_owned()
+    )
 }
 
 fn should_skip_file(file: &FileUnderTest) -> bool {
@@ -300,7 +305,9 @@ fn validate_scene_nodes(file: FileUnderTest) {
             }
 
             let is_valid = if CONFIG.allow_screaming_snake_case_in_node_names {
-                node_name_to_test.is_pascal_case() || (node_name_to_test.is_snake_case() && node_name_to_test.chars().all(|c| !c.is_lowercase()))
+                node_name_to_test.is_pascal_case()
+                    || (node_name_to_test.is_snake_case()
+                        && node_name_to_test.chars().all(|c| !c.is_lowercase()))
             } else {
                 node_name_to_test.is_pascal_case()
             };
@@ -315,7 +322,11 @@ fn validate_scene_nodes(file: FileUnderTest) {
                 ),
                 format!(
                     "Expected PascalCase{} naming-convention, but was {} in filename for '{}'",
-                    if CONFIG.allow_screaming_snake_case_in_node_names { " or SCREAMING_SNAKE_CASE" } else { "" },
+                    if CONFIG.allow_screaming_snake_case_in_node_names {
+                        " or SCREAMING_SNAKE_CASE"
+                    } else {
+                        ""
+                    },
                     node_name.bold(),
                     file.file_name.bold()
                 ),
@@ -334,8 +345,9 @@ fn validate_name(file: &FileUnderTest) {
         }
     }
 
-    let is_valid = file.file_name.is_snake_case() && file.file_name.chars().all(|c| !c.is_uppercase());
-    
+    let is_valid =
+        file.file_name.is_snake_case() && file.file_name.chars().all(|c| !c.is_uppercase());
+
     handle_validation_result(
         is_valid,
         "rule-filename-snake-case".to_owned(),
@@ -375,27 +387,21 @@ fn validate_file_root(file: &FileUnderTest) {
         return;
     }
 
-    let relative_path = file
-        .relative_path
-        .strip_prefix("\\")
-        .unwrap_or(&file.relative_path);
-
-    let in_correct_root = matched_locations
-        .iter()
-        .any(|loc| {
-            let clean_loc = loc.strip_prefix("./").unwrap_or(loc);
-            relative_path.starts_with(clean_loc)
-        });
+    let in_correct_root = matched_locations.iter().any(|loc: &String| {
+        if let Ok(pattern) = Pattern::new(loc) {
+            if pattern.matches(&file.relative_path) {
+                return true;
+            }
+        }
+        false
+    });
 
     let folders_list = matched_locations.join(" or ");
 
     handle_validation_result(
         in_correct_root,
         "rule-allowed-file-location".to_owned(),
-        format!(
-            "Found {} in correct location",
-            file.file_name.bold()
-        ),
+        format!("Found {} in correct location", file.file_name.bold()),
         format!(
             "Expected {} to be in {} but found it in {}",
             file.file_name.bold(),
@@ -405,10 +411,20 @@ fn validate_file_root(file: &FileUnderTest) {
     );
 }
 
-fn handle_validation_result(is_success: bool, rule_name: String, success_message: String, error_message: String) {
+fn handle_validation_result(
+    is_success: bool,
+    rule_name: String,
+    success_message: String,
+    error_message: String,
+) {
     if is_success {
         if SHOULD_PRINT_SUCCESS {
-            println!("\t{} ({}): {}", "Test Succesful".green(), rule_name.bright_black(), success_message)
+            println!(
+                "\t{} ({}): {}",
+                "Test Succesful".green(),
+                rule_name.bright_black(),
+                success_message
+            )
         }
     } else {
         println!("\t{}: {}", "Test Failed".red(), error_message);
@@ -426,15 +442,15 @@ fn visit_dirs(path_string: &str, dir: &Path, cb: &dyn Fn(&str, &DirEntry)) -> io
             dir.strip_prefix(path_string)
                 .unwrap_or(dir)
                 .to_str()
-                .unwrap_or("")
+                .unwrap_or(""),
         );
-        
+
         for pattern in IGNORE_PATTERNS.iter() {
             if pattern.matches(&normalized_path) {
                 return Ok(());
             }
         }
-        
+
         for entry in read_dir(dir)? {
             let entry = entry?;
             let path = entry.path();
