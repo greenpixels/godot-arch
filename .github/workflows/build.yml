@@ -21,3 +21,4 @@ jobs:
         with:
           RUSTTARGET: ${{ matrix.target }}
           EXTRA_FILES: "godot-arch.config.yaml"
+          TOOLCHAIN_VERSION: stable
