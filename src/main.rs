@@ -4,8 +4,8 @@ use inflections::Inflect;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::fs::{DirEntry, exists, read_dir};
-use std::{env, io};
 use std::path::{Path, PathBuf};
+use std::{env, io};
 
 #[derive(Debug, Deserialize)]
 struct Config {
@@ -26,10 +26,10 @@ struct Config {
     should_print_success: bool,
     #[serde(default)]
     #[serde(rename = "projectPath")]
-    project_path : String,
+    project_path: String,
     #[serde(rename = "waitForInputBeforeClose")]
     #[serde(default)]
-    wait_for_input_before_close  : bool,
+    wait_for_input_before_close: bool,
 }
 
 #[derive(Debug, Deserialize, Default)]
@@ -50,7 +50,7 @@ struct IgnorePatterns {
     scene_nodes_pascal_case: Vec<String>,
     #[serde(rename = "rule-root-node-is-file-name-pascal")]
     #[serde(default)]
-    root_node_is_file_name_pascal: Vec<String>
+    root_node_is_file_name_pascal: Vec<String>,
 }
 
 static mut VALIDATION_COUNT: i32 = 0;
@@ -58,7 +58,7 @@ static mut VALIDATION_FAILS: i32 = 0;
 
 lazy_static::lazy_static! {
     static ref CONFIG: Config = {
-        
+
         let args: Vec<String> = env::args().collect();
         let configuration_path: &str;
         if args.len() > 1 {
@@ -119,7 +119,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     enable_ansi_support();
     let start_time = std::time::Instant::now();
 
-
     let path_string: &str = CONFIG.project_path.as_str();
     let path = Path::new(path_string);
 
@@ -142,7 +141,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("\nPress any button to exit ...");
         io::stdin().read_line(&mut String::new()).unwrap();
     }
-
 
     if unsafe { VALIDATION_FAILS != 0 } {
         return Err("Some tests were not succesful".into());
@@ -300,7 +298,10 @@ fn validate_scene_nodes(file: FileUnderTest) {
                 _ => continue,
             };
 
-            let node_name = value.replace("\"", "");
+            let mut node_name = value.replace("\"", "");
+            for (uppercase, pascal_case) in UPPERCASE_TO_PASCAL_CASE.iter() {
+                node_name = node_name.replace(uppercase, pascal_case);
+            }
             if is_root_node && should_check_root_node_is_file_name_pascal {
                 is_root_node = false;
                 let file_name_as_pascal_case = file
