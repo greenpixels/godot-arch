@@ -1,10 +1,10 @@
 use colored::Colorize;
 use convert_case::{Case, Casing};
-use glob_match::glob_match;
 
 use crate::{
     models::{config::Config, file_under_test::FileUnderTest, test_results::TestResults},
     rules::handle_validation_result::handle_validation_result,
+    util::should_ignore_rule_for_file::should_ignore_rule_for_file,
 };
 
 pub fn execute_rule_filename_snake_case(
@@ -12,11 +12,12 @@ pub fn execute_rule_filename_snake_case(
     config: &Config,
     test_results: &mut TestResults,
 ) {
-    println!("execute_rule_filename_snake_case");
-    for pattern in config.ignore_patterns.filename_snake_case.iter() {
-        if glob_match(pattern, &file.relative_path) {
-            return;
-        }
+    if should_ignore_rule_for_file(
+        file,
+        Some(config.include_patterns.filename_snake_case.to_owned()),
+        Some(config.ignore_patterns.filename_snake_case.to_owned()),
+    ) {
+        return;
     }
 
     let is_valid = file.file_name.is_case(Case::Snake);

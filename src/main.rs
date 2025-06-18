@@ -1,51 +1,37 @@
 use colored::Colorize;
-use glob_match::glob_match;
-use std::collections::HashMap;
 use std::fs::{DirEntry, exists};
-use std::io;
 use std::path::Path;
+use std::{env, io};
 mod models;
 mod rules;
 mod util;
 
 use crate::models::{config::Config, file_under_test::FileUnderTest, test_results::TestResults};
-use crate::rules::rule_allowed_file_location::execute_rule_allowed_file_location;
-use crate::rules::rule_filename_snake_case::execute_rule_filename_snake_case;
-use crate::rules::rule_parent_has_same_name::execute_rule_parent_has_same_name;
-use crate::rules::rule_root_node_is_file_name_pascal::execute_rule_root_node_is_file_name_pascal;
-use crate::rules::rule_scene_nodes_pascal_case::execute_rule_scene_needs_pascal_case;
-use crate::util::{ansi::enable_ansi_support, visit_dirs::visit_dirs};
+use crate::rules::{
+    rule_allowed_file_location::execute_rule_allowed_file_location,
+    rule_filename_snake_case::execute_rule_filename_snake_case,
+    rule_parent_has_same_name::execute_rule_parent_has_same_name,
+    rule_root_node_is_file_name_pascal::execute_rule_root_node_is_file_name_pascal,
+    rule_scene_nodes_pascal_case::execute_rule_scene_needs_pascal_case,
+};
+
+use crate::util::{
+    ansi::enable_ansi_support, normalize_path::normalize_path, visit_dirs::visit_dirs,
+};
 
 lazy_static::lazy_static! {
     static ref CONFIG: Config = {
-        Config {
-            project_path: String::from("./"),
-            wait_for_input_before_close: false,
-            allowed_file_locations: HashMap::new(),
-            ignore_patterns: models::config::IgnorePatterns {
-                overall: Vec::new(),
-                allowed_file_location: Vec::new(),
-                filename_snake_case: Vec::new(),
-                parent_has_same_name: Vec::new(),
-                scene_nodes_pascal_case: Vec::new(),
-                root_node_is_file_name_pascal: Vec::new(),
-            },
-            node_name_pascal_case_exceptions: Vec::new(),
-            allow_screaming_snake_case_in_node_names: true,
-            should_print_success: true
+        let args: Vec<String> = env::args().collect();
+        let configuration_path: &str;
+        if args.len() > 1 {
+            configuration_path = &args[1];
+        } else {
+            configuration_path = "godot-arch.config.yaml";
         }
-    };
-
-    static ref UPPERCASE_TO_PASCAL_CASE: HashMap<String, String> = {
-        let mut m = HashMap::new();
-        for rewrite in &CONFIG.node_name_pascal_case_exceptions {
-            for (k, v) in rewrite {
-                m.insert(k.clone(), v.clone());
-            }
-        }
-        m
-    };    static ref IGNORE_PATTERNS: Vec<String> = {
-        CONFIG.ignore_patterns.overall.clone()
+        let config_content = std::fs::read_to_string(configuration_path)
+            .expect("Failed to read config file");
+        serde_yaml::from_str(&config_content)
+            .expect("Failed to parse config file")
     };
 }
 
@@ -64,15 +50,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     println!("Indexing in {path_string}");
 
-    visit_dirs(
-        path_string,
-        &IGNORE_PATTERNS,
-        path,
-        &mut test_results,
-        &handle_file,
-    )
-    .is_err()
-    .then(|| println!("Something went wrong!"));
+    visit_dirs(path_string, &CONFIG, path, &mut test_results, &handle_file)
+        .is_err()
+        .then(|| println!("Something went wrong!"));
 
     println!(
         "\n>\t{} tests of {} total have failed",
@@ -118,55 +98,21 @@ fn handle_file(input_path_string: &str, entry: &DirEntry, mut test_results: &mut
         ),
     };
 
-    if should_skip_file(&file_under_test) {
-        return;
-    }
-    println!(
-        "\n\n>> Testing {} in {}...",
-        file_under_test.file_name.yellow(),
-        file_under_test.relative_path.yellow()
-    );
     execute_rule_allowed_file_location(&file_under_test, &CONFIG, &mut test_results);
     execute_rule_filename_snake_case(&file_under_test, &CONFIG, &mut test_results);
     execute_rule_parent_has_same_name(&file_under_test, &CONFIG, &mut test_results);
-    execute_rule_parent_has_same_name(&file_under_test, &CONFIG, &mut test_results);
 
     if extension == "tscn" {
-        validate_scene_nodes(file_under_test, test_results);
+        validate_scene_nodes(&file_under_test, test_results);
     }
+    println!(
+        "\n\n>> {} errors in {} ...",
+        file_under_test.file_name.yellow(),
+        file_under_test.relative_path.yellow()
+    );
 }
 
-fn normalize_path(path: &str) -> String {
-    format!(
-        "./{}",
-        path.replace('\\', "/").trim_start_matches('/').to_owned()
-    )
-}
-
-fn should_skip_file(file: &FileUnderTest) -> bool {
-    IGNORE_PATTERNS
-        .iter()
-        .any(|pattern| glob_match(pattern, &file.relative_path))
-}
-
-fn validate_scene_nodes(file: FileUnderTest, test_results: &mut TestResults) {
-    let mut should_check_scene_nodes_pascal_case = true;
-    let mut should_check_root_node_is_file_name_pascal = true;
-    for pattern in CONFIG.ignore_patterns.scene_nodes_pascal_case.iter() {
-        if glob_match(pattern, &file.relative_path) {
-            should_check_scene_nodes_pascal_case = false;
-        }
-    }
-    for pattern in CONFIG.ignore_patterns.root_node_is_file_name_pascal.iter() {
-        if glob_match(pattern, &file.relative_path) {
-            should_check_root_node_is_file_name_pascal = false;
-        }
-    }
-
-    if !should_check_scene_nodes_pascal_case && !should_check_root_node_is_file_name_pascal {
-        return;
-    }
-
+fn validate_scene_nodes(file: &FileUnderTest, test_results: &mut TestResults) {
     let file_content = match std::fs::read_to_string(&file.absolute_path) {
         Ok(content) => content,
         Err(_) => return,
@@ -194,23 +140,16 @@ fn validate_scene_nodes(file: FileUnderTest, test_results: &mut TestResults) {
                 _ => continue,
             };
             let node_name = value.replace("\"", "");
-            if is_root_node && should_check_root_node_is_file_name_pascal {
+            if is_root_node {
                 is_root_node = false;
                 execute_rule_root_node_is_file_name_pascal(
                     node_name.as_str(),
-                    &file,
+                    file,
                     &CONFIG,
                     test_results,
                 );
             }
-            if should_check_scene_nodes_pascal_case {
-                execute_rule_scene_needs_pascal_case(
-                    node_name.as_str(),
-                    &file,
-                    &CONFIG,
-                    test_results,
-                );
-            }
+            execute_rule_scene_needs_pascal_case(node_name.as_str(), file, &CONFIG, test_results);
         }
     }
 }

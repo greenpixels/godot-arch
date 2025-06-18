@@ -1,34 +1,33 @@
 use crate::{
     models::{config::Config, file_under_test::FileUnderTest, test_results::TestResults},
     rules::handle_validation_result::handle_validation_result,
+    util::should_ignore_rule_for_file::should_ignore_rule_for_file,
 };
 use colored::Colorize;
-use glob_match::glob_match;
 
 pub fn execute_rule_parent_has_same_name(
     file: &FileUnderTest,
     config: &Config,
     test_results: &mut TestResults,
 ) {
-    println!("execute_rule_parent_has_same_name");
-    // Check if this file should be skipped for parent name validation
-    for pattern in config.ignore_patterns.parent_has_same_name.iter() {
-        if glob_match(pattern, &file.relative_path) {
-            return;
-        }
+    if should_ignore_rule_for_file(
+        file,
+        Some(config.include_patterns.parent_has_same_name.to_owned()),
+        Some(config.ignore_patterns.parent_has_same_name.to_owned()),
+    ) {
+        return;
     }
 
-    let parent_option = file.path.parent();
-    let mut has_parent_with_same_name = false;
-    if parent_option.is_some() {
-        let parent = parent_option.unwrap();
-        let parent_file_name_option = parent.file_name();
-        if parent_file_name_option.is_some() {
-            let file_name = parent_file_name_option.unwrap().to_str().unwrap_or("");
-            has_parent_with_same_name =
-                format!("{}.{}", file_name, file.extension) == file.file_name
-        }
-    }
+    let has_parent_with_same_name = file
+        .path
+        .parent()
+        .and_then(|parent| parent.file_name())
+        .and_then(|os_str| os_str.to_str())
+        .map(|parent_name| {
+            let file_stem = file.file_name.split('.').next().unwrap_or("");
+            parent_name == file_stem
+        })
+        .unwrap_or(false);
 
     handle_validation_result(
         has_parent_with_same_name,

@@ -4,6 +4,7 @@ use glob_match::glob_match;
 use crate::{
     models::{config::Config, file_under_test::FileUnderTest, test_results::TestResults},
     rules::handle_validation_result::handle_validation_result,
+    util::should_ignore_rule_for_file::should_ignore_rule_for_file,
 };
 
 pub fn execute_rule_allowed_file_location(
@@ -11,17 +12,18 @@ pub fn execute_rule_allowed_file_location(
     config: &Config,
     test_results: &mut TestResults,
 ) {
-    println!("execute_rule_allowed_file_location");
-    // Check if this file should be skipped for location validation
-    for pattern in config.ignore_patterns.allowed_file_location.iter() {
-        if glob_match(pattern, &file.relative_path) {
-            return;
-        }
+    if should_ignore_rule_for_file(
+        file,
+        Some(config.ignore_patterns.allowed_file_location.to_owned()),
+        None,
+    ) {
+        return;
     }
+
     let mut in_correct_root = false;
     let mut can_skip = true;
-    // Find matching pattern for this file type
     let mut matched_locations: Vec<String> = vec![];
+
     for (pattern, locations) in config.allowed_file_locations.iter() {
         if glob_match(pattern, &file.relative_path) {
             can_skip = false;

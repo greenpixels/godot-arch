@@ -1,6 +1,7 @@
 use crate::{
     models::{config::Config, file_under_test::FileUnderTest, test_results::TestResults},
     rules::handle_validation_result::handle_validation_result,
+    util::should_ignore_rule_for_file::should_ignore_rule_for_file,
 };
 use convert_case::{Case, Casing};
 
@@ -10,8 +11,24 @@ pub fn execute_rule_root_node_is_file_name_pascal(
     config: &Config,
     test_results: &mut TestResults,
 ) {
-    println!("rule_root_node_is_file_name_pascal");
-
+    if should_ignore_rule_for_file(
+        file,
+        Some(
+            config
+                .include_patterns
+                .root_node_is_file_name_pascal
+                .to_owned(),
+        ),
+        Some(
+            config
+                .ignore_patterns
+                .root_node_is_file_name_pascal
+                .to_owned(),
+        ),
+    ) {
+        return;
+    }
+    // TODO: Currently we aren't using node_name_pascal_case_exceptions here
     let file_name_as_pascal_case = file
         .file_name
         .replace(&format!(".{}", file.extension).to_string(), "")
