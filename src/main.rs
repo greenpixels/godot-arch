@@ -7,19 +7,16 @@ use std::path::Path;
 mod models;
 mod rules;
 mod util;
+
 use crate::models::{config::Config, file_under_test::FileUnderTest, test_results::TestResults};
 use crate::rules::rule_allowed_file_location::execute_rule_allowed_file_location;
 use crate::rules::rule_filename_snake_case::execute_rule_filename_snake_case;
 use crate::rules::rule_parent_has_same_name::execute_rule_parent_has_same_name;
-use crate::rules::rule_root_node_is_file_name_pascal::rule_root_node_is_file_name_pascal;
+use crate::rules::rule_root_node_is_file_name_pascal::execute_rule_root_node_is_file_name_pascal;
 use crate::rules::rule_scene_nodes_pascal_case::execute_rule_scene_needs_pascal_case;
 use crate::util::{ansi::enable_ansi_support, visit_dirs::visit_dirs};
 
 lazy_static::lazy_static! {
-    static ref TEST_RESULTS: std::sync::Mutex<TestResults> = std::sync::Mutex::new(
-         TestResults { files_tested: 0, files_failed: 0 }
-    );
-
     static ref CONFIG: Config = {
         Config {
             project_path: String::from("./"),
@@ -57,17 +54,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let start_time = std::time::Instant::now();
     let path_string: &str = CONFIG.project_path.as_str();
     let path = Path::new(path_string);
-    let final_test_results = TEST_RESULTS.lock().unwrap();
+    let mut test_results: TestResults = TestResults {
+        files_tested: 0,
+        files_failed: 0,
+    };
+
     if !exists(path).is_ok() {
         panic!("Tried to index a path that does not exist {path_string}")
     }
     println!("Indexing in {path_string}");
-    visit_dirs(path_string, &IGNORE_PATTERNS, path, &handle_file)
-        .is_err()
-        .then(|| "Something went wrong");
+
+    visit_dirs(
+        path_string,
+        &IGNORE_PATTERNS,
+        path,
+        &mut test_results,
+        &handle_file,
+    )
+    .is_err()
+    .then(|| println!("Something went wrong!"));
+
     println!(
         "\n>\t{} tests of {} total have failed",
-        final_test_results.files_failed, final_test_results.files_tested
+        test_results.files_failed, test_results.files_tested
     );
 
     let elapsed_time = start_time.elapsed();
@@ -77,20 +86,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         io::stdin().read_line(&mut String::new()).unwrap();
     }
 
-    if final_test_results.files_failed != 0 {
+    if test_results.files_failed != 0 {
         return Err("Some tests were not succesful".into());
     }
     return Ok(());
 }
 
-fn handle_file(input_path_string: &str, entry: &DirEntry) {
+fn handle_file(input_path_string: &str, entry: &DirEntry, mut test_results: &mut TestResults) {
     let path = entry.path();
     let full_path = path.to_str().unwrap_or("");
     let file_name = path
         .file_name()
         .and_then(|comp| comp.to_str())
         .unwrap_or("");
-
     let extension = path.extension().and_then(|ext| ext.to_str()).unwrap_or("");
 
     let file_under_test = FileUnderTest {
@@ -110,24 +118,21 @@ fn handle_file(input_path_string: &str, entry: &DirEntry) {
         ),
     };
 
-    validate_file(file_under_test, extension)
-}
-
-fn validate_file(file: FileUnderTest, extension: &str) {
-    if should_skip_file(&file) {
+    if should_skip_file(&file_under_test) {
         return;
     }
     println!(
         "\n\n>> Testing {} in {}...",
-        file.file_name.yellow(),
-        file.relative_path.yellow()
+        file_under_test.file_name.yellow(),
+        file_under_test.relative_path.yellow()
     );
-    execute_rule_allowed_file_location(&file, &CONFIG, &mut TEST_RESULTS.lock().unwrap());
-    execute_rule_filename_snake_case(&file, &CONFIG, &mut TEST_RESULTS.lock().unwrap());
-    execute_rule_parent_has_same_name(&file, &CONFIG, &mut TEST_RESULTS.lock().unwrap());
-    execute_rule_parent_has_same_name(&file, &CONFIG, &mut TEST_RESULTS.lock().unwrap());
+    execute_rule_allowed_file_location(&file_under_test, &CONFIG, &mut test_results);
+    execute_rule_filename_snake_case(&file_under_test, &CONFIG, &mut test_results);
+    execute_rule_parent_has_same_name(&file_under_test, &CONFIG, &mut test_results);
+    execute_rule_parent_has_same_name(&file_under_test, &CONFIG, &mut test_results);
+
     if extension == "tscn" {
-        validate_scene_nodes(file);
+        validate_scene_nodes(file_under_test, test_results);
     }
 }
 
@@ -144,7 +149,7 @@ fn should_skip_file(file: &FileUnderTest) -> bool {
         .any(|pattern| glob_match(pattern, &file.relative_path))
 }
 
-fn validate_scene_nodes(file: FileUnderTest) {
+fn validate_scene_nodes(file: FileUnderTest, test_results: &mut TestResults) {
     let mut should_check_scene_nodes_pascal_case = true;
     let mut should_check_root_node_is_file_name_pascal = true;
     for pattern in CONFIG.ignore_patterns.scene_nodes_pascal_case.iter() {
@@ -191,11 +196,11 @@ fn validate_scene_nodes(file: FileUnderTest) {
             let node_name = value.replace("\"", "");
             if is_root_node && should_check_root_node_is_file_name_pascal {
                 is_root_node = false;
-                rule_root_node_is_file_name_pascal(
+                execute_rule_root_node_is_file_name_pascal(
                     node_name.as_str(),
                     &file,
                     &CONFIG,
-                    &mut TEST_RESULTS.lock().unwrap(),
+                    test_results,
                 );
             }
             if should_check_scene_nodes_pascal_case {
@@ -203,7 +208,7 @@ fn validate_scene_nodes(file: FileUnderTest) {
                     node_name.as_str(),
                     &file,
                     &CONFIG,
-                    &mut TEST_RESULTS.lock().unwrap(),
+                    test_results,
                 );
             }
         }

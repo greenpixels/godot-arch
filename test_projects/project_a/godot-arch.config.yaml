@@ -1,0 +1,72 @@
+projectPath: .
+
+# File patterns listed here will be ignored
+ignorePatterns:
+    overall:
+        - ./godot-arch*
+        - ./godot-arch.config.yaml
+        - ./addons/**
+        - ./export/**
+        - ./.export_templates/**
+        - ./.git
+        - ./.github
+        - ./.godot
+        - ./**/*.uid
+        - ./**/*.tmp
+
+    "rule-allowed-file-location":
+    "rule-filename-snake-case":
+    "rule-parent-has-same-name":
+    "rule-scene-nodes-pascal-case":
+    "rule-root-node-is-file-name-pascal":
+
+# Tests whether the given file pattern matches its pattern list
+# This means you can allow .tscn files only in a specific location
+allowedFileLocations:
+    "./**/*.tscn":
+        - ./globals/**
+        - ./scenes/**
+    "./**/*.gd":
+        - ./globals/**
+        - ./scenes/**
+        - ./resources/**
+    "./**/*.gdshader":
+        - ./shaders/**
+    "./**/*.{png,jpg,jpeg,gif,webp,ico}":
+        - ./assets/images/**
+    "./**/*.{mp3,wave,ogg,flac,aac,m4a}":
+        - ./assets/audio/** 
+    "./**/*.{ttf}":
+        - ./assets/fonts/**
+    "./**/*.translation":
+        - ./localization/**
+
+# Tests check wether or not a node is written in PascalCase, but
+# some standard Godot nodes don't adhere to that rule. We add exceptions and remaps for these cases.
+# This does not rename your nodes, it just helps the test to pass
+nodeNamePascalCaseExceptions:
+    - GPU: Gpu
+    - URL: Url
+    - HTTP: Http
+    - VBoxContainer: VerticalBoxContainer
+    - HBoxContainer: HorizontalBoxContainer
+    - HFlowContainer: HorizontalFlowContainer
+    - VFlowContainer: VerticalFlowContainer
+    - HScrollBar: HorizontalScrollBar
+    - HSplitContainer: HorizontalSplitContainer
+    - VSplitContainer: VerticalSplitContainer
+    - VScrollBar: VerticalScrollBar
+    - HSlider: HorizontalSlider
+    - VSlider: VerticalSlider
+    - HSeparator: HorizontalSeperator
+    - VSeparator: VerticalSeperator
+    - CPU: Cpu
+    - VoxelGI: VoxelGlobalIllumination
+    - LightmapGI: LightmapGlobalIllumination
+
+# Some projects use translation keys in node names (e.g children of TabContainer) and have the translation keys as SCREAMING_SNAKE_CASE
+# If so, either add the hosting scene to ignorePatterns.overall, ignorePatterns.rule-scene-nodes-pascal-case or set this to true
+allowScreamingSnakeCaseInNodeNames: false
+
+shouldPrintSuccess: true
+waitForInputBeforeClose: false

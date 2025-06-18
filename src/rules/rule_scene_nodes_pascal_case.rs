@@ -12,6 +12,8 @@ pub fn execute_rule_scene_needs_pascal_case(
     config: &Config,
     test_results: &mut TestResults,
 ) {
+    println!("execute_rule_scene_needs_pascal_case");
+
     let node_name_to_test = node_name.to_owned();
     let mut is_valid = node_name_to_test.is_case(Case::Pascal);
     if config.allow_screaming_snake_case_in_node_names && !is_valid {

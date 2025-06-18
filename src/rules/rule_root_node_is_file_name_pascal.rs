@@ -4,12 +4,14 @@ use crate::{
 };
 use convert_case::{Case, Casing};
 
-pub fn rule_root_node_is_file_name_pascal(
+pub fn execute_rule_root_node_is_file_name_pascal(
     node_name: &str,
     file: &FileUnderTest,
     config: &Config,
     test_results: &mut TestResults,
 ) {
+    println!("rule_root_node_is_file_name_pascal");
+
     let file_name_as_pascal_case = file
         .file_name
         .replace(&format!(".{}", file.extension).to_string(), "")

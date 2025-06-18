@@ -10,6 +10,7 @@ pub fn execute_rule_parent_has_same_name(
     config: &Config,
     test_results: &mut TestResults,
 ) {
+    println!("execute_rule_parent_has_same_name");
     // Check if this file should be skipped for parent name validation
     for pattern in config.ignore_patterns.parent_has_same_name.iter() {
         if glob_match(pattern, &file.relative_path) {

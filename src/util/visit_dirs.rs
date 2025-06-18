@@ -4,14 +4,15 @@ use std::{
     path::Path,
 };
 
-use crate::normalize_path;
+use crate::{models::test_results::TestResults, normalize_path};
 use glob_match::glob_match;
 
 pub fn visit_dirs(
     path_string: &str,
     ignore_patterns: &Vec<String>,
     dir: &Path,
-    callback: &dyn Fn(&str, &DirEntry),
+    test_results: &mut TestResults,
+    callback: &dyn Fn(&str, &DirEntry, &mut TestResults),
 ) -> io::Result<()> {
     if dir.is_dir() {
         let normalized_path = normalize_path(
@@ -30,9 +31,10 @@ pub fn visit_dirs(
             let entry = entry?;
             let path = entry.path();
             if path.is_dir() {
-                visit_dirs(path_string, ignore_patterns, &path, callback)?;
+                visit_dirs(path_string, ignore_patterns, &path, test_results, callback)?;
             } else {
-                callback(path_string, &entry);
+                println!("Running callback");
+                callback(path_string, &entry, test_results);
             }
         }
     }

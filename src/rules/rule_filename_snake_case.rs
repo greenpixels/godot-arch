@@ -12,7 +12,7 @@ pub fn execute_rule_filename_snake_case(
     config: &Config,
     test_results: &mut TestResults,
 ) {
-    // Check if this file should be skipped for filename validation
+    println!("execute_rule_filename_snake_case");
     for pattern in config.ignore_patterns.filename_snake_case.iter() {
         if glob_match(pattern, &file.relative_path) {
             return;

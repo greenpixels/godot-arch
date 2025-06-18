@@ -11,6 +11,7 @@ pub fn execute_rule_allowed_file_location(
     config: &Config,
     test_results: &mut TestResults,
 ) {
+    println!("execute_rule_allowed_file_location");
     // Check if this file should be skipped for location validation
     for pattern in config.ignore_patterns.allowed_file_location.iter() {
         if glob_match(pattern, &file.relative_path) {
