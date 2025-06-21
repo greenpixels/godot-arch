@@ -16,6 +16,7 @@ pub fn execute_rule_filename_snake_case(
         file,
         Some(config.include_patterns.filename_snake_case.to_owned()),
         Some(config.ignore_patterns.filename_snake_case.to_owned()),
+        config,
     ) {
         return;
     }
@@ -30,8 +31,9 @@ pub fn execute_rule_filename_snake_case(
             file.file_name.bold()
         ),
         format!(
-            "Expected lowercase snake_case for {}, but got {}",
+            "Expected lowercase snake_case for {} - should be {}, but got {}",
             file.file_name.bold(),
+            file.file_name.to_case(Case::Snake).bold(),
             file.file_name.bold()
         ),
         config,

@@ -3,6 +3,7 @@ projectPath: .
 # File patterns listed here will be included
 includePatterns:
     "rule-filename-snake-case":
+        - ./**
     "rule-parent-has-same-name":
         - ./**/*.tscn
         - ./**/*.gd
@@ -16,7 +17,6 @@ includePatterns:
 ignorePatterns:
     overall:
         - ./godot-arch*
-        - ./godot-arch.config.yaml
         - ./addons/**
         - ./export/**
         - ./.export_templates/**
@@ -59,8 +59,6 @@ allowedFileLocations:
 # some standard Godot nodes don't adhere to that rule. We add exceptions and remaps for these cases.
 # This does not rename your nodes, it just helps the test to pass
 nodeNamePascalCaseExceptions:
-    - URL: Url
-    - GPU: Gpu
 allowScreamingSnakeCaseInNodeNames: false
 shouldPrintSuccess: true
 waitForInputBeforeClose: false

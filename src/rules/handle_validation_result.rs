@@ -11,7 +11,7 @@ pub fn handle_validation_result(
     if is_success {
         if config.should_print_success {
             println!(
-                "\t{} ({}): {}",
+                "{} ({}): {}",
                 "Test Succesful".green(),
                 rule_name.bright_black(),
                 success_message
@@ -19,7 +19,7 @@ pub fn handle_validation_result(
         }
     } else {
         println!(
-            "\t{} ({}): {}",
+            "{} ({}): {}",
             "Test Failed".red(),
             rule_name.bright_black(),
             error_message

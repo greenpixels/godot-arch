@@ -14,6 +14,7 @@ pub fn execute_rule_parent_has_same_name(
         file,
         Some(config.include_patterns.parent_has_same_name.to_owned()),
         Some(config.ignore_patterns.parent_has_same_name.to_owned()),
+        config,
     ) {
         return;
     }

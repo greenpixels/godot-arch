@@ -16,6 +16,7 @@ pub fn execute_rule_allowed_file_location(
         file,
         Some(config.ignore_patterns.allowed_file_location.to_owned()),
         None,
+        config,
     ) {
         return;
     }

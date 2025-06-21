@@ -3,6 +3,7 @@ use crate::{
     rules::handle_validation_result::handle_validation_result,
     util::should_ignore_rule_for_file::should_ignore_rule_for_file,
 };
+use colored::Colorize;
 use convert_case::{Case, Casing};
 
 pub fn execute_rule_root_node_is_file_name_pascal(
@@ -25,6 +26,7 @@ pub fn execute_rule_root_node_is_file_name_pascal(
                 .root_node_is_file_name_pascal
                 .to_owned(),
         ),
+        config,
     ) {
         return;
     }
@@ -39,11 +41,14 @@ pub fn execute_rule_root_node_is_file_name_pascal(
         "rule-root-node-is-file-name-pascal".to_owned(),
         format!(
             "Root node of {} is {}",
-            file.file_name, file_name_as_pascal_case
+            file.file_name.bold(),
+            file_name_as_pascal_case.bold()
         ),
         format!(
             "Expected root node of {} to be {}, but was {}",
-            file.file_name, file_name_as_pascal_case, node_name
+            file.file_name.bold(),
+            file_name_as_pascal_case.bold(),
+            node_name.bold()
         ),
         config,
         test_results,

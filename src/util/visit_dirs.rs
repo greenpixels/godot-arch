@@ -35,7 +35,6 @@ pub fn visit_dirs(
                 .iter()
                 .any(|pattern| glob_match(pattern, &normalized_path))
             {
-                println!("Skipped!");
                 continue;
             }
 

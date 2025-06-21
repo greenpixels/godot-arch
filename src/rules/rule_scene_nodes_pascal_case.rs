@@ -17,6 +17,7 @@ pub fn execute_rule_scene_needs_pascal_case(
         file,
         Some(config.include_patterns.scene_nodes_pascal_case.to_owned()),
         Some(config.ignore_patterns.scene_nodes_pascal_case.to_owned()),
+        config,
     ) {
         return;
     }
@@ -42,14 +43,14 @@ pub fn execute_rule_scene_needs_pascal_case(
             file.file_name.bold()
         ),
         format!(
-            "Expected PascalCase{} naming-convention, but was {} in filename for '{}'",
+            "Expected PascalCase{} naming-convention for node in '{}', but was {}",
             if config.allow_screaming_snake_case_in_node_names {
                 " or SCREAMING_SNAKE_CASE"
             } else {
                 ""
             },
+            file.file_name.bold(),
             node_name.bold(),
-            file.file_name.bold()
         ),
         config,
         test_results,

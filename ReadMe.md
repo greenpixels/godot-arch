@@ -2,9 +2,9 @@
 
 > 🚧👷‍♂️ **Please Note:** GodotArch is still in early development. Please report any bugs and issues you find.
 
-An extremely fast project structure linter four your Godot projects. GodotArch enforces consistent file organization and naming conventions across your Godot projects, making them more maintainable and easier to navigate. 
+An extremely fast project structure linter four your Godot projects. GodotArch enforces consistent file organization and naming conventions, making them more maintainable and easier to navigate. 
 
-It can check scenes, scripts, nodes, assets, and more. It is also extremely configurable via its `godot-arch.config.yaml`. Check out the **Rules**-Section for more information.
+It can check scenes, scripts, nodes, assets, and more. It is also extremely configurable via its `godot-arch.config.yaml`.
 
 ## How To Use
 
@@ -17,128 +17,77 @@ In order to use GodotArch you need to have its executable and configuration insi
 - Unpack the contents into your project-root (`godot-arch.config.yaml` and `godot-arch`)
 - (*optional*) customize the configuration in `godot-arch.config.yaml`
 ### 3. Usage
-- Execute  `godot-arch` either locally in your terminal or preferrably in your CI via e.g. GitHub-Actions
+- Execute  `godot-arch` either locally in your terminal or preferrably in your CI via e.g. "*GitHub-Actions*"
 
-### Requirements
+## Available Rules
+GodotArch comes with a set of preconfigured rules that are a personal recommendation. You can of course customize that behaviour via the `godot-arch.config.yaml` configuration file.
 
-## Checks and Default Rules
-These are the default rules that GodotArch checks for. You can of course customize that behaviour via `godot-arch.config.yaml`, but it is recommended to adhere to these defaults. They are a mix of examples in the Godot Documentation and its best-pratices, aswell as inspired by different Godot projects I have seen over times.
-### Files
-- **MUST** have filename in `snake_case`
-
-### Scenes (.tscn)
-- **MUST** be in `(ROOT)/scenes/**` or `(ROOT)/globals/**`
-- **MUST** have root node with same name as file in *PascalCase*
-- **MUST** be in folder with same name as file
-
-### Scripts (.gd)
-- **MUST** be in `(ROOT)/scenes/**`, `(ROOT)/globals/**`, `(ROOT)/resources/**`, or `(ROOT)/test/**`
-- **MUST** be in folder with same name as file
-
-### Resources (.tres)
-- **MUST** be in `(ROOT)/resources/**`
-- **MUST** be in folder with same name as file
-
-### Shaders (.gdshader)
-- **MUST** be in `(ROOT)/shaders/**`
-
-### Translations (.translation)
-- **MUST** be in `(ROOT)/localization/**`
-
-### Assets
-- Images (.png, .jpg, .jpeg, .gif, .webp, .ico) **MUST** be in `(ROOT)/assets/images/**`
-- Audio (.mp3, .wave, .ogg, .flac, .aac, .m4a) **MUST** be in `(ROOT)/assets/audio/**`
-
-### Nodes
-- Nodes ...
-    - **MUST** have their name in *PascalCase*
-    - This helps maintain consistency with Godot's built-in node naming conventions
-
-## Configuration
-
-The `godot-arch.config.yaml` file allows you to customize the linter's behavior. Here are the main configuration sections:
-
-### ignorePatterns
-
-Specify file patterns to be ignored by the linter:
->  🚨 **Please note:** All patterns in this configuration need to begin with `./`
-
-```yaml
-ignorePatterns:
-    overall:  # Ignored by all rules
-        - ./godot-arch.exe
-        - ./addons/**
-        - ...
-
-    # You can also ignore files for specific rules via glob patterns here:
-    "rule-allowed-file-location": # <- Checks the file path against allowedFileLocations
-        - ./my_example_file.tscn
-    "rule-filename-snake-case": # <- Checks whether the filename is written in snake_case
-    "rule-parent-has-same-name": # <- Checks whether the parent folder has the same name as the file (e.g ./player/player.gd)
-    "rule-scene-nodes-pascal-case": # <- Checks whether all nodes are in PascalCase
-```
-
-### allowedFileLocations
-
-Define where specific file types are allowed to be located:
->  🚨 **Please note:** All patterns in this configuration need to begin with `./`
+### Rule: `"Allowed File Location"`
+Checks whether matched files are allowed to be in the location they are in. For example, if we want `.tscn` files to only be somewhere inside of a `./scenes` folder and `.png` and `.jpeg` only to be inside of `./images` you can declare the rules as:
 
 ```yaml
 allowedFileLocations:
-    "./**/*.tscn":  # Scene files
-        - ./globals/**
+    "./**/*.tscn":
         - ./scenes/**
-    "./**/*.gd":    # Script files
-        - ./globals/**
-        - ./scenes/**
-    "./**/*.{png,jpg,jpeg,gif,webp,ico}":  # Image files
-        - ./assets/images/**
+    "./**/*.{png,jpeg}":
+        - ./images/**
 ```
 
-### nodeNamePascalCaseExceptions
+### Rule: `"Filename Snake Case"`
+Checks whether the matched files should have their file names be written in snake_case. Examples would be `player_animation_01.png`, `level_01.tscn`, ...
 
-Configure exceptions for node naming conventions, especially useful for standard Godot nodes that don't follow PascalCase.
+To adhere every file in your project this rule you can set the includePattern for this rule as such:
 
 ```yaml
-nodeNamePascalCaseExceptions:
-    - GPU: Gpu
-    - VBoxContainer: VerticalBoxContainer
-    - HBoxContainer: HorizontalBoxContainer
-    # etc...
+includePatterns:
+    "rule-filename-snake-case":
+        - ./**
 ```
 
-### allowScreamingSnakeCaseInNodeNames
-
-If your project uses translation keys as node names (e.g., childrne of *TabContainer*):
+### Rule: `"Parent Has Same Name"`
+Checks whether the matches files are inside a folder that has the same name as the file itself. For example, if we always want `.tscn` and `.gd` files to be placed into a folder with the same name you can declare the rule as:
 
 ```yaml
-# Set to true if you use SCREAMING_SNAKE_CASE for translation keys in node names
-allowScreamingSnakeCaseInNodeNames: false
+includePatterns:
+    "rule-filename-snake-case":
+        - ./**/*.tscn
+        - ./**/*.gd
 ```
 
-Alternatively, you can add specific scenes to the ignore patterns if they contain translation keys.
+This would result in a file structure that would look like:
+- /scenes
+  - /player  
+    - player&#46;gd
+    - player&#46;tscn
 
-### shouldPrintSuccess
+### Rule: `"Root Node Is File Name Pascal"`
+Checks whether the file-name and the root-node-name as `PascalCase` inside a `.tscn` file match for the matched files. Meaning a scene-file that is named `inventory_grid.tscn` should have a root-node that is named `InventoryGrid.tscn`
 
-Controls whether successful rule checks should print output:
+I would recommend turning this rule on for every `.tscn`-file.
 
 ```yaml
-# Set to true to see output for passing checks
-shouldPrintSuccess: true
+includePatterns:
+    "rule-root-node-is-file-name-pascal":
+        - ./**/*.tscn
 ```
 
-When enabled, this will show confirmations for files that pass the linting rules, not just errors.
+### Rule: `"Scene Nodes Are Pascal Case"`
+Checks whether the nodes inside of a scene tree are all written in `PascalCase`
+
+I would recommend turning this rule on for every `.tscn`-file.
+
+```yaml
+includePatterns:
+    "rule-scene-nodes-pascal-case":
+        - ./**/*.tscn
+```
 
 ## Planned Features
 
 ### Maintenance
-- [ ] Split code into modules for better maintainability
 - [ ] Write unit tests for core functionality
 
 ### Additional Tests
 - [ ] Scripts and Scenes configured as autoload in project settings are actually inside of autoload and vice versa
 - [ ] Root nodes of a scene that contain a script should have that script next to that scene
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.

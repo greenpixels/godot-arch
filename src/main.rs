@@ -98,6 +98,9 @@ fn handle_file(input_path_string: &str, entry: &DirEntry, mut test_results: &mut
         ),
     };
 
+    let previous_fails = test_results.files_failed;
+    let previous_tests = test_results.files_tested;
+
     execute_rule_allowed_file_location(&file_under_test, &CONFIG, &mut test_results);
     execute_rule_filename_snake_case(&file_under_test, &CONFIG, &mut test_results);
     execute_rule_parent_has_same_name(&file_under_test, &CONFIG, &mut test_results);
@@ -105,11 +108,16 @@ fn handle_file(input_path_string: &str, entry: &DirEntry, mut test_results: &mut
     if extension == "tscn" {
         validate_scene_nodes(&file_under_test, test_results);
     }
-    println!(
-        "\n\n>> {} errors in {} ...",
-        file_under_test.file_name.yellow(),
-        file_under_test.relative_path.yellow()
-    );
+
+    if previous_tests != test_results.files_tested
+        && (test_results.files_failed > previous_fails || CONFIG.should_print_success)
+    {
+        println!(
+            ">>>\t{} errors in {} ...\n\n",
+            test_results.files_failed - previous_fails,
+            file_under_test.relative_path.yellow()
+        );
+    }
 }
 
 fn validate_scene_nodes(file: &FileUnderTest, test_results: &mut TestResults) {
