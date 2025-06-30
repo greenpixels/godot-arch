@@ -2,7 +2,7 @@
 
 > 🚧👷‍♂️ **Please Note:** GodotArch is still in early development. Please report any bugs and issues you find.
 
-An extremely fast project structure linter four your Godot projects. GodotArch enforces consistent file organization and naming conventions, making them more maintainable and easier to navigate. 
+An extremely fast project structure linter for your Godot projects. GodotArch enforces consistent file organization and naming conventions, making them more maintainable and easier to navigate. 
 
 It can check scenes, scripts, nodes, assets, and more. It is also extremely configurable via its `godot-arch.config.yaml`.
 
