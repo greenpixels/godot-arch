@@ -52,7 +52,7 @@ pub fn execute_rule_scene_needs_pascal_case(
             file.file_name.bold(),
             node_name.bold(),
         ),
-        config,
+        config.should_print_success,
         test_results,
     );
 }

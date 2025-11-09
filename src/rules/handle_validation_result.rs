@@ -5,11 +5,11 @@ pub fn handle_validation_result(
     rule_name: String,
     success_message: String,
     error_message: String,
-    config: &crate::models::config::Config,
+    should_print_success: bool,
     test_results: &mut crate::models::test_results::TestResults,
 ) {
     if is_success {
-        if config.should_print_success {
+        if should_print_success {
             println!(
                 "{} ({}): {}",
                 "Test Succesful".green(),

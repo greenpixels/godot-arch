@@ -69,20 +69,16 @@ jobs:
           name: godot-arch-windows
           path: godot-arch-windows.zip
 
-  # TODO: Write actual unit tests
-  # test:
-  #   needs: [build-linux, build-windows]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Download Linux artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: godot-arch-linux
-  #     - name: 
-  #       run: tar xf ./godot-arch-linux.tar.gz -C ./test_projects/project_a/
-  #     - name: Run GodotArch for Test-Project A
-  #       run: cd ./test_projects/project_a && ./godot-arch
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run tests
+        run: cargo test
 
   create-release:
     needs: [build-linux, build-windows]

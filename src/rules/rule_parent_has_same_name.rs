@@ -42,7 +42,7 @@ pub fn execute_rule_parent_has_same_name(
             file.file_name.bold(),
             file.relative_path.bold()
         ),
-        config,
+        config.should_print_success,
         test_results,
     );
 }

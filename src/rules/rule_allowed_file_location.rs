@@ -14,7 +14,7 @@ pub fn execute_rule_allowed_file_location(
 ) {
     if should_ignore_rule_for_file(
         file,
-       None,
+        None,
         Some(config.ignore_patterns.allowed_file_location.to_owned()),
         config,
     ) {
@@ -51,7 +51,7 @@ pub fn execute_rule_allowed_file_location(
             folders_list.bold(),
             file.relative_path.bold(),
         ),
-        config,
+        config.should_print_success,
         test_results,
     );
 }

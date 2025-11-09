@@ -50,7 +50,7 @@ pub fn execute_rule_root_node_is_file_name_pascal(
             file_name_as_pascal_case.bold(),
             node_name.bold()
         ),
-        config,
+        config.should_print_success,
         test_results,
     );
 }

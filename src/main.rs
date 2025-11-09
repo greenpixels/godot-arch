@@ -4,6 +4,8 @@ use std::path::Path;
 use std::{env, io};
 mod models;
 mod rules;
+#[cfg(test)]
+mod tests;
 mod util;
 
 use crate::models::{config::Config, file_under_test::FileUnderTest, test_results::TestResults};

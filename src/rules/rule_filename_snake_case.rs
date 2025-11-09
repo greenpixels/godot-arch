@@ -36,7 +36,7 @@ pub fn execute_rule_filename_snake_case(
             file.file_name.to_case(Case::Snake).bold(),
             file.file_name.bold()
         ),
-        config,
+        config.should_print_success,
         test_results,
     );
 }
