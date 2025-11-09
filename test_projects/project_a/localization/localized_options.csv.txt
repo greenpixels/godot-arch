@@ -1,3 +1,0 @@
-key,en,de
-OPTION_VOLUME,Volume,Lautstärke
-OPTION_FULLSCREEN,Fullscreen,Vollbild
