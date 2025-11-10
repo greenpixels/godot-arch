@@ -30,11 +30,10 @@ pub fn execute_rule_scene_needs_pascal_case(
 
     let mut is_valid = node_name_to_test.is_case(Case::Pascal);
     if config.allow_screaming_snake_case_in_node_names && !is_valid {
-        is_valid =
-            node_name_to_test.is_case(Case::Upper) && node_name_to_test.is_case(Case::UpperSnake);
+        is_valid = node_name_to_test.is_case(Case::UpperSnake);
     }
 
-    handle_validation_result(
+    let validation_output = handle_validation_result(
         is_valid,
         "rule-scene-nodes-pascal-case".to_owned(),
         format!(
@@ -55,4 +54,7 @@ pub fn execute_rule_scene_needs_pascal_case(
         config.should_print_success,
         test_results,
     );
+    if validation_output.is_some() {
+        println!("{}", validation_output.unwrap())
+    }
 }

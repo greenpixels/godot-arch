@@ -15,7 +15,7 @@ pub fn visit_dirs(
     config: &Config,
     dir: &Path,
     test_results: &mut TestResults,
-    callback: &dyn Fn(&str, &DirEntry, &mut TestResults),
+    callback: &dyn Fn(&str, &DirEntry, &mut TestResults, &Config),
 ) -> io::Result<()> {
     if dir.is_dir() {
         for entry in read_dir(dir)? {
@@ -41,7 +41,7 @@ pub fn visit_dirs(
             if path.is_dir() {
                 visit_dirs(path_string, config, &path, test_results, callback)?;
             } else {
-                callback(path_string, &entry, test_results);
+                callback(path_string, &entry, test_results, config);
             }
         }
     }

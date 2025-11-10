@@ -36,7 +36,7 @@ pub fn execute_rule_root_node_is_file_name_pascal(
         .replace(&format!(".{}", file.extension).to_string(), "")
         .to_case(Case::Pascal);
     let root_node_has_same_name = file_name_as_pascal_case == node_name;
-    handle_validation_result(
+    let validation_output = handle_validation_result(
         root_node_has_same_name,
         "rule-root-node-is-file-name-pascal".to_owned(),
         format!(
@@ -53,4 +53,7 @@ pub fn execute_rule_root_node_is_file_name_pascal(
         config.should_print_success,
         test_results,
     );
+    if validation_output.is_some() {
+        println!("{}", validation_output.unwrap())
+    }
 }
