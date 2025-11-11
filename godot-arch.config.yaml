@@ -1,7 +1,6 @@
-projectPath: .
-
-# File patterns listed here will be included
 includePatterns:
+    "rule-allowed-file-location":
+        - ./**
     "rule-filename-snake-case":
         - ./**
     "rule-parent-has-same-name":
@@ -10,30 +9,23 @@ includePatterns:
     "rule-scene-nodes-pascal-case":
         - ./**/*.tscn
     "rule-root-node-is-file-name-pascal":
-        - ./**/*.tscn
+        -  ./**/*.tscn
+    "rule-root-node-script-in-same-folder":
+        -  ./**/*.tscn
+    "rule-node-depth-fits-max-depth":
+        -  ./**/*.tscn
 
-
-# File patterns listed here will be ignored
 ignorePatterns:
     overall:
         - ./godot-arch*
         - ./addons/**
         - ./export/**
         - ./.export_templates/**
-        - ./.git
-        - ./.github
-        - ./.godot
         - ./**/*.uid
         - ./**/*.tmp
+        # Ignore hidden files
+        - ./**/.{*}
 
-    "rule-allowed-file-location":
-    "rule-filename-snake-case":
-    "rule-parent-has-same-name":
-    "rule-scene-nodes-pascal-case":
-    "rule-root-node-is-file-name-pascal":
-
-# Tests whether the given file pattern matches its pattern list
-# This means you can allow .tscn files only in a specific location
 allowedFileLocations:
     "./**/*.tscn":
         - ./globals/**
@@ -54,11 +46,3 @@ allowedFileLocations:
         - ./assets/fonts/**
     "./**/*.translation":
         - ./localization/**
-
-# Tests check wether or not a node is written in PascalCase, but
-# some standard Godot nodes don't adhere to that rule. We add exceptions and remaps for these cases.
-# This does not rename your nodes, it just helps the test to pass
-nodeNamePascalCaseExceptions:
-allowScreamingSnakeCaseInNodeNames: false
-shouldPrintSuccess: true
-waitForInputBeforeClose: false

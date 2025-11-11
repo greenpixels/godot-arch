@@ -1,7 +1,7 @@
 use colored::Colorize;
 use std::fs::{DirEntry, exists};
 use std::path::Path;
-use std::{env, io};
+use std::{env, io, vec};
 mod models;
 mod rules;
 #[cfg(test)]
@@ -9,6 +9,8 @@ mod tests;
 mod util;
 
 use crate::models::{config::Config, file_under_test::FileUnderTest, test_results::TestResults};
+use crate::rules::rule_node_depth_fits_max_depth::execute_rule_node_depth_fits_max_depth;
+use crate::rules::rule_root_node_script_in_same_folder::execute_rule_root_node_script_in_same_folder;
 use crate::rules::{
     rule_allowed_file_location::execute_rule_allowed_file_location,
     rule_filename_snake_case::execute_rule_filename_snake_case,
@@ -17,6 +19,7 @@ use crate::rules::{
     rule_scene_nodes_pascal_case::execute_rule_scene_needs_pascal_case,
 };
 
+use crate::util::parse_scene_file::parse_scene_file;
 use crate::util::{
     ansi::enable_ansi_support, normalize_path::normalize_path, visit_dirs::visit_dirs,
 };
@@ -43,6 +46,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut test_results: TestResults = TestResults {
         files_tested: 0,
         files_failed: 0,
+        warnings: vec![],
     };
 
     if !exists(path).is_ok() {
@@ -53,6 +57,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     visit_dirs(path_string, &config, path, &mut test_results, &handle_file)
         .is_err()
         .then(|| println!("Something went wrong!"));
+
+    if test_results.warnings.len() > 0 {
+        for warning in &test_results.warnings {
+            println!(
+                "{} {}\n>>>     in {}",
+                "Warning:".yellow(),
+                warning.message.yellow(),
+                warning.absolute_path.bright_black()
+            );
+        }
+    }
 
     println!(
         "\n>\t{} tests of {} total have failed",
@@ -67,7 +82,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     if test_results.files_failed != 0 {
-        return Err("Some tests were not succesful".into());
+        return Err("Some tests were not successful".into());
     }
     return Ok(());
 }
@@ -126,43 +141,32 @@ fn handle_file(
 }
 
 fn validate_scene_nodes(file: &FileUnderTest, test_results: &mut TestResults, config: &Config) {
-    let file_content = match std::fs::read_to_string(&file.absolute_path) {
-        Ok(content) => content,
-        Err(_) => return,
+    let parsed_scene_file = match parse_scene_file(file.absolute_path.to_owned()) {
+        Err(warning) => {
+            test_results.warnings.push(warning);
+            return;
+        }
+        Ok(result) => result,
     };
 
     let mut is_root_node = true;
-    for line in file_content.lines() {
-        if !line.starts_with('[') || !line.ends_with(']') {
-            continue;
-        }
-
-        let trimmed_line = line.trim_matches(|c| c == '[' || c == ']');
-        let (section_key, rest) = match trimmed_line.split_once(' ') {
-            Some(parts) => parts,
-            None => continue,
+    execute_rule_root_node_script_in_same_folder(&parsed_scene_file, file, config, test_results);
+    for node in &parsed_scene_file.nodes {
+        let node_name = match node.header_properties.get("name") {
+            None => return,
+            Some(name) => name,
         };
 
-        if section_key != "node" {
-            continue;
+        if is_root_node {
+            execute_rule_root_node_is_file_name_pascal(
+                node_name.as_str(),
+                file,
+                config,
+                test_results,
+            );
+            is_root_node = false;
         }
-
-        for pair in rest.split_whitespace() {
-            let (_key, value) = match pair.split_once('=') {
-                Some(kv) if kv.0 == "name" => kv,
-                _ => continue,
-            };
-            let node_name = value.replace("\"", "");
-            if is_root_node {
-                is_root_node = false;
-                execute_rule_root_node_is_file_name_pascal(
-                    node_name.as_str(),
-                    file,
-                    config,
-                    test_results,
-                );
-            }
-            execute_rule_scene_needs_pascal_case(node_name.as_str(), file, config, test_results);
-        }
+        execute_rule_scene_needs_pascal_case(node_name.as_str(), file, config, test_results);
+        execute_rule_node_depth_fits_max_depth(node, node_name, file, config, test_results);
     }
 }

@@ -1,4 +1,4 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::HashMap, path::PathBuf, vec};
 
 use crate::models::{config::Config, file_under_test::FileUnderTest, test_results::TestResults};
 
@@ -6,6 +6,7 @@ pub fn get_test_results_mock() -> TestResults {
     return TestResults {
         files_tested: 0,
         files_failed: 0,
+        warnings: vec![],
     };
 }
 
@@ -34,22 +35,20 @@ pub fn get_config_mock() -> Config {
         allow_screaming_snake_case_in_node_names: false,
         allowed_file_locations: HashMap::new(),
         ignore_patterns: crate::models::config::IgnorePatterns {
-            overall: vec![],
-            allowed_file_location: vec![],
-            filename_snake_case: vec![],
-            parent_has_same_name: vec![],
-            scene_nodes_pascal_case: vec![],
-            root_node_is_file_name_pascal: vec![],
+            ..Default::default()
         },
         include_patterns: crate::models::config::IncludePatterns {
             filename_snake_case: vec!["./**".to_owned()],
             parent_has_same_name: vec!["./**".to_owned()],
             scene_nodes_pascal_case: vec!["./**".to_owned()],
             root_node_is_file_name_pascal: vec!["./**".to_owned()],
+            root_node_script_in_same_folder: vec!["./**".to_owned()],
+            node_depth_fits_max_depth: vec!["./**".to_owned()],
         },
         node_name_pascal_case_exceptions: vec![],
         project_path: ".".to_string(),
         should_print_success: true,
         wait_for_input_before_close: false,
+        max_node_depth: 4,
     };
 }

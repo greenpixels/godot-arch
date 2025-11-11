@@ -22,12 +22,23 @@ pub struct Config {
     #[serde(default)]
     #[serde(rename = "shouldPrintSuccess")]
     pub should_print_success: bool,
-    #[serde(default)]
+    #[serde(default = "default_project_path")]
     #[serde(rename = "projectPath")]
     pub project_path: String,
     #[serde(rename = "waitForInputBeforeClose")]
     #[serde(default)]
     pub wait_for_input_before_close: bool,
+    #[serde(rename = "maxNodeDepth")]
+    #[serde(default = "default_max_node_depth")]
+    pub max_node_depth: usize,
+}
+
+fn default_project_path() -> String {
+    ".".to_owned()
+}
+
+fn default_max_node_depth() -> usize {
+    4
 }
 
 #[derive(Debug, Deserialize, Default)]
@@ -49,6 +60,12 @@ pub struct IgnorePatterns {
     #[serde(rename = "rule-root-node-is-file-name-pascal")]
     #[serde(default)]
     pub root_node_is_file_name_pascal: Vec<String>,
+    #[serde(rename = "rule-root-node-script-in-same-folder")]
+    #[serde(default)]
+    pub root_node_script_in_same_folder: Vec<String>,
+    #[serde(rename = "rule-node-depth-fits-max-depth")]
+    #[serde(default)]
+    pub node_depth_fits_max_depth: Vec<String>,
 }
 #[derive(Debug, Deserialize, Default)]
 pub struct IncludePatterns {
@@ -64,4 +81,10 @@ pub struct IncludePatterns {
     #[serde(rename = "rule-root-node-is-file-name-pascal")]
     #[serde(default)]
     pub root_node_is_file_name_pascal: Vec<String>,
+    #[serde(rename = "rule-root-node-script-in-same-folder")]
+    #[serde(default)]
+    pub root_node_script_in_same_folder: Vec<String>,
+    #[serde(rename = "rule-node-depth-fits-max-depth")]
+    #[serde(default)]
+    pub node_depth_fits_max_depth: Vec<String>,
 }
