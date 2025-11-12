@@ -21,7 +21,7 @@ In order to use GodotArch you need to have its `godot-arch` executable and a `go
 - Run `./godot-arch` (or `./godot-arch.exe` for Windows) either locally in your terminal or in your CI via e.g. "*GitHub-Actions*"
 
 ## Linting Rules
-GodotArch comes with a set of preconfigured rules and defaults that are a personal perference. You can of course completely customize that behaviour via the `godot-arch.config.yaml` configuration file by adding or removing rules from `includePatterns` and `ignorePatterns`.
+GodotArch comes with a set of preconfigured rules and defaults that are a personal preference. You can of course completely customize that behaviour via the `godot-arch.config.yaml` configuration file by adding or removing rules from `includePatterns` and `ignorePatterns`.
 
 ### Rule: `"Allowed File Location"` 
 Checks whether matched files are allowed to be in the location they are in. For example, if we want `.tscn` files to only be somewhere inside of a `./scenes` folder and we also want `.png` and `.jpeg` only to be inside of `./images`, then we can declare it as such:
@@ -62,7 +62,7 @@ Checks whether the matched files are inside a folder that has the same name as t
 
 ```yaml
 includePatterns:
-    "rule-filename-snake-case":
+    "rule-parent-has-same-name":
         - ./**/*.tscn
         - ./**/*.gd
 ```
@@ -80,7 +80,7 @@ This would result in a file structure that would look like:
 - Add this file or all files to `ignorePatterns:` -> `rule-parent-has-same-name:`
 
 ### Rule: `"Root Node Is File Name Pascal"`
-Checks whether the file-name and the root-node-name as `PascalCase` inside a `.tscn` file match for the matched files. Meaning a scene-file that is named `inventory_grid.tscn` should have a root-node that is named `InventoryGrid.tscn`
+Checks whether the file-name and the root-node-name as `PascalCase` inside a `.tscn` file match for the matched files. Meaning a scene-file that is named `inventory_grid.tscn` should have a root-node that is named `InventoryGrid`
 
 I would recommend turning this rule on for every `.tscn`-file.
 
