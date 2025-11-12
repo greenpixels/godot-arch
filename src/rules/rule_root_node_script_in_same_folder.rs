@@ -53,6 +53,7 @@ pub fn execute_rule_root_node_script_in_same_folder(
     if !script_resource.starts_with("ExtResource(") {
         test_results.warnings.push(Warning {
             message: format!(
+                // TODO https://github.com/greenpixels/godot-arch/issues/5
                 "A scene with a non-external script (e.g. \"built-in scripts\") resource can't be parsed, resource is {}",
                 script_resource
             ),

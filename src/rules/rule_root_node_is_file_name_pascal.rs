@@ -30,7 +30,7 @@ pub fn execute_rule_root_node_is_file_name_pascal(
     ) {
         return;
     }
-    // TODO: Currently we aren't using node_name_pascal_case_exceptions here
+    // TODO https://github.com/greenpixels/godot-arch/issues/6: Currently we aren't using node_name_pascal_case_exceptions here
     let file_name_as_pascal_case = file
         .file_name
         .replace(&format!(".{}", file.extension).to_string(), "")

@@ -102,7 +102,7 @@ pub fn parse_scene_file(absolute_path: String) -> Result<ParsedSceneFileData, Wa
 }
 
 /**
- * TODO: This does not yet correctly handle multiline properties like:
+ * TODO https://github.com/greenpixels/godot-arch/issues/4: This does not yet correctly handle multiline properties like:
  * ```
  * [sub_resource type="Curve2D" id="Curve2D_o3865"]
  *   _data = {
@@ -159,7 +159,7 @@ fn initialize_scene_entry_from_parsed_header(
             continue;
         }
         let pair = optional_pair.unwrap();
-        // TODO: find a clean way to handle built-in scripts
+        // TODO https://github.com/greenpixels/godot-arch/issues/5: find a clean way to handle built-in scripts
         if check_for_built_in_script(pair) {
             return Err(format!(
                 "{}",
