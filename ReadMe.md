@@ -11,7 +11,7 @@ It can check scenes, scripts, nodes, assets, and more. It is also extremely conf
 In order to use GodotArch you need to have its `godot-arch` executable and a `godot-arch.config.yaml` configuration file at your project root.
 ### 1. Requirements
 - A Godot project developed with `Godot 4.4` or higher
-    - (Earlier versions may work, but are untested. )
+    - (Earlier versions may work, but are untested.)
 
 ### 2. Installation & Setup
 - [Download](https://github.com/greenpixels/godot-arch/releases) the latest release for your platform
@@ -21,10 +21,10 @@ In order to use GodotArch you need to have its `godot-arch` executable and a `go
 - Run `./godot-arch` (or `./godot-arch.exe` for Windows) either locally in your terminal or in your CI via e.g. "*GitHub-Actions*"
 
 ## Linting Rules
-GodotArch comes with a set of preconfigured rules and defaults that are a personal preference. You can of course completely customize that behaviour via the `godot-arch.config.yaml` configuration file by adding or removing rules from `includePatterns` and `ignorePatterns`.
+GodotArch comes with a set of preconfigured rules and defaults that are a personal preference. You can of course completely customize that behavior via the `godot-arch.config.yaml` configuration file by adding or removing rules from `includePatterns` and `ignorePatterns`.
 
 ### Rule: `"Allowed File Location"` 
-Checks whether matched files are allowed to be in the location they are in. For example, if we want `.tscn` files to only be somewhere inside of a `./scenes` folder and we also want `.png` and `.jpeg` only to be inside of `./images`, then we can declare it as such:
+Checks whether matched files are allowed to be in the location they are in. For example, if we want `.tscn` files to only be somewhere inside of a `./scenes` folder and we also want `.png` and `.jpeg` only to be inside of `./images`, then we can configure it as:
 
 ```yaml
 allowedFileLocations:
@@ -58,7 +58,7 @@ includePatterns:
 - Add this file or all files to `ignorePatterns:` -> `rule-filename-snake-case:`
 
 ### Rule: `"Parent Has Same Name"`
-Checks whether the matched files are inside a folder that has the same name as the file itself. For example, if we always want `.tscn` and `.gd` files to be placed into a folder with the same name you can declare the rule as:
+Checks whether the matched files are inside a folder that has the same name as the file itself. For example, if we always want `.tscn` and `.gd` files to be placed into a folder with the same name you can configure it as:
 
 ```yaml
 includePatterns:
@@ -80,7 +80,9 @@ This would result in a file structure that would look like:
 - Add this file or all files to `ignorePatterns:` -> `rule-parent-has-same-name:`
 
 ### Rule: `"Root Node Is File Name Pascal"`
-Checks whether the file-name and the root-node-name as `PascalCase` inside a `.tscn` file match for the matched files. Meaning a scene-file that is named `inventory_grid.tscn` should have a root-node that is named `InventoryGrid`
+Checks whether the file name and root node name (both as `PascalCase`) match inside a `.tscn` file. Meaning a scene file that is named `inventory_grid.tscn` should have a root node that is named `InventoryGrid`
+
+> All non-scene files are automatically ignored as they don't have any nodes.
 
 I would recommend turning this rule on for every `.tscn`-file.
 
@@ -96,7 +98,9 @@ includePatterns:
 - Add this file or all files to `ignorePatterns:` -> `rule-root-node-is-file-name-pascal:`
 
 ### Rule: `"Scene Nodes Are Pascal Case"`
-Checks whether the nodes inside of a scene tree are all written in `PascalCase`
+Checks whether the nodes inside a scene tree are all written in `PascalCase`
+
+> All non-scene files are automatically ignored as they don't have any nodes.
 
 I would recommend turning this rule on for every `.tscn`-file.
 
@@ -121,7 +125,9 @@ nodeNamePascalCaseExceptions:
 - Add this file or all files to `ignorePatterns:` -> `rule-scene-nodes-pascal-case:`
 
 ### Rule: `"Node Depth Fits Max Depth"`
-Checks how deeply a node is nested in a scene tree. Should not overexceed `maxNodeDepth`, which you can optionally set in your configuration. (default is `4`).
+Checks how deeply a node is nested in a scene tree. Should not exceed `maxNodeDepth`, which you can optionally set in your configuration. (default is `4`).
+
+> All non-scene files are automatically ignored as they don't have any nodes.
 
 I would recommend turning this rule on for every `.tscn`-file.
 
@@ -140,11 +146,13 @@ maxNodeDepth: 3
 - Add this file or all files to `ignorePatterns:` -> `rule-node-depth-fits-max-depth:`
 
 ### Rule: `"Root Node Script In Same Folder"`
-Checks whether the script of the root node of a scene is placed next to that scene. Lets assume you have a `Player.tscn`. If the root node of that scene has a script, then that script should be `Player.gd`. And that script should be placed next to `Player.tscn`, resulting in:
+Checks whether the script of the root node of a scene is placed next to that scene. Let's assume you have a `Player.tscn`. If the root node of that scene has a script, then that script should be `Player.gd`. And that script should be placed next to `Player.tscn`, resulting in:
 
 - player/
     - player.gd
     - player.tscn
+
+> All non-scene files are automatically ignored as they don't have any nodes.
 
 I would recommend turning this rule on for every `.tscn`-file.
 
