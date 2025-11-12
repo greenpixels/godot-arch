@@ -39,6 +39,7 @@ allowedFileLocations:
 #### How to mitigate on failure:
 - Move the affected file into a folder matching the configured pattern
 - Reconfigure `allowedFileLocations:` to reflect your preferred changes
+- Add this file or all files to `ignorePatterns:` -> `rule-allowed-file-location:`
 
 ### Rule: `"Filename Snake Case"`
 Checks whether the matched files should have their file names be written in snake_case. Examples would be `player_animation_01.png`, `level_01.tscn`, ...
@@ -53,7 +54,8 @@ includePatterns:
 
 #### How to mitigate on failure:
 - Rename the affected file to *snake_case*
-- Reconfigure `includePatterns:` to reflect your preferred changes
+- Reconfigure `includePatterns:` -> `rule-filename-snake-case:` to reflect your preferred changes
+- Add this file or all files to `ignorePatterns:` -> `rule-filename-snake-case:`
 
 ### Rule: `"Parent Has Same Name"`
 Checks whether the matched files are inside a folder that has the same name as the file itself. For example, if we always want `.tscn` and `.gd` files to be placed into a folder with the same name you can declare the rule as:
@@ -74,7 +76,8 @@ This would result in a file structure that would look like:
 #### How to mitigate on failure:
 - Rename the affected file to fit the folder above
 - Rename the folder to fit the affected file
-- Reconfigure `includePatterns:` to reflect your preferred changes
+- Reconfigure `includePatterns:` -> `rule-parent-has-same-name:` to reflect your preferred changes
+- Add this file or all files to `ignorePatterns:` -> `rule-parent-has-same-name:`
 
 ### Rule: `"Root Node Is File Name Pascal"`
 Checks whether the file-name and the root-node-name as `PascalCase` inside a `.tscn` file match for the matched files. Meaning a scene-file that is named `inventory_grid.tscn` should have a root-node that is named `InventoryGrid.tscn`
@@ -89,7 +92,8 @@ includePatterns:
 #### How to mitigate on failure:
 - Rename the affected node inside the tree to be the PascalCase version of its scene file name
 - Rename the scene file to be the snake_case version of the affected node
-- Reconfigure `includePatterns:` to reflect your preferred changes
+- Reconfigure `includePatterns:` -> `rule-root-node-is-file-name-pascal:` to reflect your preferred changes
+- Add this file or all files to `ignorePatterns:` -> `rule-root-node-is-file-name-pascal:`
 
 ### Rule: `"Scene Nodes Are Pascal Case"`
 Checks whether the nodes inside of a scene tree are all written in `PascalCase`
@@ -113,7 +117,8 @@ nodeNamePascalCaseExceptions:
 #### How to mitigate on failure:
 - Rename the affected nodes to *PascalCase*
 - Reconfigure or add `nodeNamePascalCaseExceptions:` and add a remap to the affected node name
-- Reconfigure `includePatterns:` to reflect your preferred changes
+- Reconfigure `includePatterns:` -> `rule-scene-nodes-pascal-case:` to reflect your preferred changes
+- Add this file or all files to `ignorePatterns:` -> `rule-scene-nodes-pascal-case:`
 
 ### Rule: `"Node Depth Fits Max Depth"`
 Checks how deeply a node is nested in a scene tree. Should not overexceed `maxNodeDepth`, which you can optionally set in your configuration. (default is `4`).
@@ -127,6 +132,12 @@ includePatterns:
 
 maxNodeDepth: 3
 ```
+
+#### How to mitigate on failure:
+- Refactor the affected node branch into a new scene
+- Reconfigure `maxNodeDepth:` to reflect your preferred changes
+- Reconfigure `includePatterns:` -> `rule-node-depth-fits-max-depth:` to reflect your preferred changes
+- Add this file or all files to `ignorePatterns:` -> `rule-node-depth-fits-max-depth:`
 
 ### Rule: `"Root Node Script In Same Folder"`
 Checks whether the script of the root node of a scene is placed next to that scene. Lets assume you have a `Player.tscn`. If the root node of that scene has a script, then that script should be `Player.gd`. And that script should be placed next to `Player.tscn`, resulting in:
@@ -142,6 +153,11 @@ includePatterns:
     "rule-root-node-script-in-same-folder":
         - ./**/*.tscn
 ```
+
+#### How to mitigate on failure:
+- Move the script of the affected root node next to the root node
+- Reconfigure `includePatterns:` -> `rule-root-node-script-in-same-folder:` to reflect your preferred changes
+- Add this file or all files to `ignorePatterns:` -> `rule-root-node-script-in-same-folder:`
 
 ## Planned Features
 
