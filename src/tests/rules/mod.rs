@@ -2,6 +2,8 @@
 mod test_handle_validation_result;
 mod test_rule_allowed_file_location;
 mod test_rule_filename_scake_case;
+mod test_rule_node_depth_fits_max_depth;
 mod test_rule_parent_has_same_name;
 mod test_rule_root_node_is_file_name_pascal;
+mod test_rule_root_node_script_in_same_folder;
 mod test_rule_scene_nodes_pascal_case;

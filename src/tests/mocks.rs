@@ -1,6 +1,9 @@
 use std::{collections::HashMap, path::PathBuf, vec};
 
-use crate::models::{config::Config, file_under_test::FileUnderTest, test_results::TestResults};
+use crate::{
+    models::{config::Config, file_under_test::FileUnderTest, test_results::TestResults},
+    util::parse_scene_file::{ParsedSceneEntry, ParsedSceneFileData},
+};
 
 pub fn get_test_results_mock() -> TestResults {
     return TestResults {
@@ -50,5 +53,51 @@ pub fn get_config_mock() -> Config {
         should_print_success: true,
         wait_for_input_before_close: false,
         max_node_depth: 4,
+    };
+}
+
+pub fn get_parsed_scene_file_data_mock() -> ParsedSceneFileData {
+    return ParsedSceneFileData {
+        meta: ParsedSceneEntry {
+            classifier: crate::util::parse_scene_file::HeaderClassifier::GdScene,
+            header_properties: HashMap::new(),
+            properties: HashMap::new(),
+        },
+        nodes: vec![],
+        external_resources: vec![],
+        sub_resources: vec![],
+        connections: vec![],
+    };
+}
+
+pub fn get_scene_node_mock_with_external_script(name: &str, script_id: &str) -> ParsedSceneEntry {
+    let mut header_properties: HashMap<String, String> = HashMap::new();
+    header_properties.insert(String::from("name"), String::from(name));
+    header_properties.insert(String::from("type"), String::from("Node2D"));
+
+    let mut properties: HashMap<String, String> = HashMap::new();
+    properties.insert(
+        String::from("script"),
+        String::from(format!("ExtResource(\"{}\")", script_id)),
+    );
+
+    return ParsedSceneEntry {
+        classifier: crate::util::parse_scene_file::HeaderClassifier::Node,
+        header_properties: header_properties,
+        properties: properties,
+    };
+}
+
+pub fn get_scene_external_resource(res_path: &str, script_id: &str) -> ParsedSceneEntry {
+    let mut header_properties: HashMap<String, String> = HashMap::new();
+    header_properties.insert(String::from("type"), String::from("Script"));
+    header_properties.insert(String::from("path"), String::from(res_path));
+    header_properties.insert(String::from("id"), String::from(script_id));
+    header_properties.insert(String::from("uid"), String::from("uid://b20d51xcgous8"));
+
+    return ParsedSceneEntry {
+        classifier: crate::util::parse_scene_file::HeaderClassifier::ExtResource,
+        header_properties: header_properties,
+        properties: HashMap::new(),
     };
 }
