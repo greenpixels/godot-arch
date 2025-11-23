@@ -21,10 +21,10 @@ pub fn handle_validation_result(
         ));
     }
     test_results.files_failed += 1;
-    return Some(format!(
+    Some(format!(
         "{} ({}): {}",
         "Test Failed".red(),
         rule_name.bright_black(),
         error_message
-    ));
+    ))
 }

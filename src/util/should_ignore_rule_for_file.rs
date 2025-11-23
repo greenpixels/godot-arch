@@ -16,23 +16,21 @@ pub fn should_ignore_rule_for_file(
         return true;
     }
 
-    if let Some(ignore_patterns) = &ignore_patterns {
-        if ignore_patterns
+    if let Some(ignore_patterns) = &ignore_patterns
+        && ignore_patterns
             .iter()
             .any(|pattern| glob_match(pattern, &file.relative_path))
-        {
-            return true;
-        }
+    {
+        return true;
     }
 
-    if let Some(include_patterns) = &include_patterns {
-        if !include_patterns
+    if let Some(include_patterns) = &include_patterns
+        && !include_patterns
             .iter()
             .any(|pattern| glob_match(pattern, &file.relative_path))
-        {
-            return true;
-        }
+    {
+        return true;
     }
 
-    return false;
+    false
 }

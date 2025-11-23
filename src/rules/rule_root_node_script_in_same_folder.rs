@@ -34,7 +34,7 @@ pub fn execute_rule_root_node_script_in_same_folder(
     }
 
     // No need to test if there arent any nodes to test against, as unlikely as that may be
-    if _parsed_scene.nodes.len() <= 0 {
+    if _parsed_scene.nodes.is_empty() {
         return;
     }
 
@@ -74,10 +74,7 @@ pub fn execute_rule_root_node_script_in_same_folder(
             && id_prop.map(|p| p.value.as_str()) == Some(script_resource_id)
     });
 
-    if optional_external_script_resource.is_none() {
-        is_valid = false
-    } else {
-        let script_resource = optional_external_script_resource.unwrap();
+    if let Some(script_resource) = optional_external_script_resource {
         let script_path = match script_resource.properties.iter().find(|p| p.key == "path") {
             None => "".to_owned(),
             Some(prop) => prop.value.trim_start_matches("res://").to_owned(),
@@ -88,6 +85,8 @@ pub fn execute_rule_root_node_script_in_same_folder(
             is_valid =
                 file.relative_path.replace(&file.extension, "gd") == format!("./{}", script_path);
         }
+    } else {
+        is_valid = false
     }
 
     let validation_output = handle_validation_result(

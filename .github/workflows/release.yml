@@ -1,0 +1,89 @@
+name: Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  lifecycle:
+    uses: ./.github/workflows/lifecycle.yml
+
+  prepare-linux:
+    needs: [lifecycle]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download Linux binary
+        uses: actions/download-artifact@v4
+        with:
+          name: godot-arch-linux-binary
+          path: binary
+
+      - name: Prepare files
+        run: |
+          mkdir bundle
+          cp binary/godot-arch bundle/
+          chmod +x bundle/godot-arch
+          cp godot-arch.config.yaml bundle/
+
+      - name: Create tar.gz archive
+        run: tar -czvf godot-arch-linux.tar.gz -C bundle .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-arch-linux
+          path: godot-arch-linux.tar.gz
+
+  prepare-windows:
+    needs: [lifecycle]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download Windows binary
+        uses: actions/download-artifact@v4
+        with:
+          name: godot-arch-windows-binary
+          path: binary
+
+      - name: Prepare files
+        run: |
+          mkdir bundle
+          copy binary\godot-arch.exe bundle\
+          copy godot-arch.config.yaml bundle\
+
+      - name: Create zip archive
+        run: Compress-Archive -Path bundle\* -DestinationPath godot-arch-windows.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-arch-windows
+          path: godot-arch-windows.zip
+
+  create-release:
+    needs: [prepare-linux, prepare-windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: godot-arch-linux
+          
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: godot-arch-windows
+
+      - name: Upload Release Assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} godot-arch-linux.tar.gz
+          gh release upload ${{ github.event.release.tag_name }} godot-arch-windows.zip

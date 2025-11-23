@@ -5,8 +5,7 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-  release:
-    types: [created]
+  workflow_call:
 
 jobs:
   delete-artifacts:
@@ -28,20 +27,11 @@ jobs:
       - name: Build for Linux
         run: cargo build --release
 
-      - name: Prepare files
-        run: |
-          mkdir bundle
-          cp target/release/godot-arch bundle/
-          cp godot-arch.config.yaml bundle/
-
-      - name: Create tar.gz archive
-        run: tar -czvf godot-arch-linux.tar.gz -C bundle .
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: godot-arch-linux
-          path: godot-arch-linux.tar.gz
+          name: godot-arch-linux-binary
+          path: target/release/godot-arch
 
   build-windows:
     runs-on: windows-latest
@@ -54,20 +44,11 @@ jobs:
       - name: Build for Windows
         run: cargo build --release
 
-      - name: Prepare files
-        run: |
-          mkdir bundle
-          copy target\release\godot-arch.exe bundle\
-          copy godot-arch.config.yaml bundle\
-
-      - name: Create zip archive
-        run: Compress-Archive -Path bundle\* -DestinationPath godot-arch-windows.zip
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: godot-arch-windows
-          path: godot-arch-windows.zip
+          name: godot-arch-windows-binary
+          path: target/release/godot-arch.exe
 
   test:
     runs-on: ubuntu-latest
@@ -76,32 +57,20 @@ jobs:
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Check formatting
+        run: cargo fmt --check
+
+      - name: Run clippy
+        run: cargo clippy -- -D warnings
+
+      - name: Build release
+        run: cargo build --release
 
       - name: Run tests
         run: cargo test
 
-  create-release:
-    needs: [build-linux, build-windows]
-    if: github.event_name == 'release'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    
-    steps:
-      - uses: actions/checkout@v4
-      - name: Download Linux artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: godot-arch-linux
-          
-      - name: Download Windows artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: godot-arch-windows
-
-      - name: Upload Release Assets
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
-        run: |
-          gh release upload ${{ github.event.release.tag_name }} godot-arch-linux.tar.gz
-          gh release upload ${{ github.event.release.tag_name }} godot-arch-windows.zip
+      - name: Check documentation
+        run: cargo doc --no-deps

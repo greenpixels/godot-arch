@@ -27,15 +27,14 @@ use crate::util::{
 
 fn load_config() -> Config {
     let args: Vec<String> = env::args().collect();
-    let configuration_path: &str;
-    if args.len() > 1 {
-        configuration_path = &args[1];
+    let configuration_path: &str = if args.len() > 1 {
+        &args[1]
     } else {
-        configuration_path = "godot-arch.config.yaml";
-    }
+        "godot-arch.config.yaml"
+    };
     let config_content =
         std::fs::read_to_string(configuration_path).expect("Failed to read config file");
-    return serde_yaml::from_str(&config_content).expect("Failed to parse config file");
+    serde_yaml::from_str(&config_content).expect("Failed to parse config file")
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -50,7 +49,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         warnings: vec![],
     };
 
-    if !exists(path).is_ok() {
+    if exists(path).is_err() {
         panic!("Tried to index a path that does not exist {path_string}")
     }
     println!("Indexing in {path_string}");
@@ -59,7 +58,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .is_err()
         .then(|| println!("Something went wrong!"));
 
-    if test_results.warnings.len() > 0 {
+    if !test_results.warnings.is_empty() {
         for warning in &test_results.warnings {
             println!(
                 "{} {}\n>>>     in {}",
@@ -85,13 +84,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if test_results.files_failed != 0 {
         return Err("Some tests were not successful".into());
     }
-    return Ok(());
+    Ok(())
 }
 
 fn handle_file(
     input_path_string: &str,
     entry: &DirEntry,
-    mut test_results: &mut TestResults,
+    test_results: &mut TestResults,
     config: &Config,
 ) {
     let path = entry.path();
@@ -122,9 +121,9 @@ fn handle_file(
     let previous_fails = test_results.files_failed;
     let previous_tests = test_results.files_tested;
 
-    execute_rule_allowed_file_location(&file_under_test, config, &mut test_results);
-    execute_rule_filename_snake_case(&file_under_test, config, &mut test_results);
-    execute_rule_parent_has_same_name(&file_under_test, config, &mut test_results);
+    execute_rule_allowed_file_location(&file_under_test, config, test_results);
+    execute_rule_filename_snake_case(&file_under_test, config, test_results);
+    execute_rule_parent_has_same_name(&file_under_test, config, test_results);
 
     if extension == "tscn" {
         validate_scene_nodes(&file_under_test, test_results, config);
