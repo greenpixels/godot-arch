@@ -5,6 +5,7 @@ use crate::{
         get_test_results_mock,
     },
 };
+use godot_properties_parser::parsers::parser_property::UntypedProperty;
 
 fn assert_results(parent_path: &str, expected_files_tested: i32, expected_files_failed: i32) {
     let mut test_results = get_test_results_mock();
@@ -13,9 +14,10 @@ fn assert_results(parent_path: &str, expected_files_tested: i32, expected_files_
     config.max_node_depth = 3;
 
     let mut parsed_node = get_scene_node_mock_with_external_script("File", "myverycooltestid");
-    parsed_node
-        .header_properties
-        .insert(String::from("parent"), String::from(parent_path));
+    parsed_node.properties.push(UntypedProperty {
+        key: String::from("parent"),
+        value: String::from(parent_path),
+    });
 
     execute_rule_node_depth_fits_max_depth(
         &parsed_node,

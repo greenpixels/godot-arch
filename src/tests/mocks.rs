@@ -1,8 +1,9 @@
-use std::{collections::HashMap, path::PathBuf, vec};
+use std::collections::HashMap;
+use std::{path::PathBuf, vec};
 
-use crate::{
-    models::{config::Config, file_under_test::FileUnderTest, test_results::TestResults},
-    util::parse_scene_file::{ParsedSceneEntry, ParsedSceneFileData},
+use crate::models::{config::Config, file_under_test::FileUnderTest, test_results::TestResults};
+use godot_properties_parser::parsers::{
+    parser_property::UntypedProperty, parser_property_file::Section, parser_scene_file::SceneFile,
 };
 
 pub fn get_test_results_mock() -> TestResults {
@@ -56,48 +57,62 @@ pub fn get_config_mock() -> Config {
     };
 }
 
-pub fn get_parsed_scene_file_data_mock() -> ParsedSceneFileData {
-    return ParsedSceneFileData {
-        meta: ParsedSceneEntry {
-            classifier: crate::util::parse_scene_file::HeaderClassifier::GdScene,
-            header_properties: HashMap::new(),
-            properties: HashMap::new(),
-        },
-        nodes: vec![],
-        external_resources: vec![],
+pub fn get_parsed_scene_file_data_mock() -> SceneFile {
+    return SceneFile {
+        header: None,
+        ext_resources: vec![],
         sub_resources: vec![],
+        nodes: vec![],
         connections: vec![],
+        editables: vec![],
+        all_sections: vec![],
     };
 }
 
-pub fn get_scene_node_mock_with_external_script(name: &str, script_id: &str) -> ParsedSceneEntry {
-    let mut header_properties: HashMap<String, String> = HashMap::new();
-    header_properties.insert(String::from("name"), String::from(name));
-    header_properties.insert(String::from("type"), String::from("Node2D"));
+pub fn get_scene_node_mock_with_external_script(name: &str, script_id: &str) -> Section {
+    let properties = vec![
+        UntypedProperty {
+            key: String::from("name"),
+            value: String::from(name),
+        },
+        UntypedProperty {
+            key: String::from("type"),
+            value: String::from("Node2D"),
+        },
+        UntypedProperty {
+            key: String::from("script"),
+            value: format!("ExtResource(\"{}\")", script_id),
+        },
+    ];
 
-    let mut properties: HashMap<String, String> = HashMap::new();
-    properties.insert(
-        String::from("script"),
-        String::from(format!("ExtResource(\"{}\")", script_id)),
-    );
-
-    return ParsedSceneEntry {
-        classifier: crate::util::parse_scene_file::HeaderClassifier::Node,
-        header_properties: header_properties,
-        properties: properties,
+    return Section {
+        header_type: String::from("node"),
+        properties,
     };
 }
 
-pub fn get_scene_external_resource(res_path: &str, script_id: &str) -> ParsedSceneEntry {
-    let mut header_properties: HashMap<String, String> = HashMap::new();
-    header_properties.insert(String::from("type"), String::from("Script"));
-    header_properties.insert(String::from("path"), String::from(res_path));
-    header_properties.insert(String::from("id"), String::from(script_id));
-    header_properties.insert(String::from("uid"), String::from("uid://b20d51xcgous8"));
+pub fn get_scene_external_resource(res_path: &str, script_id: &str) -> Section {
+    let properties = vec![
+        UntypedProperty {
+            key: String::from("type"),
+            value: String::from("Script"),
+        },
+        UntypedProperty {
+            key: String::from("path"),
+            value: String::from(res_path),
+        },
+        UntypedProperty {
+            key: String::from("id"),
+            value: String::from(script_id),
+        },
+        UntypedProperty {
+            key: String::from("uid"),
+            value: String::from("uid://b20d51xcgous8"),
+        },
+    ];
 
-    return ParsedSceneEntry {
-        classifier: crate::util::parse_scene_file::HeaderClassifier::ExtResource,
-        header_properties: header_properties,
-        properties: HashMap::new(),
+    return Section {
+        header_type: String::from("ext_resource"),
+        properties,
     };
 }

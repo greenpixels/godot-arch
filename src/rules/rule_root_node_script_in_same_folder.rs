@@ -3,15 +3,13 @@ use crate::{
         config::Config, file_under_test::FileUnderTest, test_results::TestResults, warning::Warning,
     },
     rules::handle_validation_result::handle_validation_result,
-    util::{
-        parse_scene_file::ParsedSceneFileData,
-        should_ignore_rule_for_file::should_ignore_rule_for_file,
-    },
+    util::should_ignore_rule_for_file::should_ignore_rule_for_file,
 };
 use colored::Colorize;
+use godot_properties_parser::parsers::parser_scene_file::SceneFile;
 
 pub fn execute_rule_root_node_script_in_same_folder(
-    _parsed_scene: &ParsedSceneFileData,
+    _parsed_scene: &SceneFile,
     file: &FileUnderTest,
     config: &Config,
     test_results: &mut TestResults,
@@ -45,11 +43,10 @@ pub fn execute_rule_root_node_script_in_same_folder(
         Some(node) => node,
     };
 
-    if !root_node.properties.contains_key("script") {
-        return;
-    }
-
-    let script_resource = root_node.properties.get("script").unwrap();
+    let script_resource = match root_node.properties.iter().find(|p| p.key == "script") {
+        Some(prop) => &prop.value,
+        None => return,
+    };
     if !script_resource.starts_with("ExtResource(") {
         test_results.warnings.push(Warning {
             message: format!(
@@ -67,21 +64,23 @@ pub fn execute_rule_root_node_script_in_same_folder(
         .trim_end_matches("\")");
 
     let is_valid: bool;
-    let optional_external_script_resource =
-        _parsed_scene.external_resources.iter().find(|&resource| {
-            resource.header_properties.contains_key("uid")
-                && resource.header_properties.contains_key("type")
-                && resource.header_properties.get("type").unwrap() == "Script"
-                && resource.header_properties.get("id").unwrap() == script_resource_id
-        });
+    let optional_external_script_resource = _parsed_scene.ext_resources.iter().find(|&resource| {
+        let has_uid = resource.properties.iter().any(|p| p.key == "uid");
+        let type_prop = resource.properties.iter().find(|p| p.key == "type");
+        let id_prop = resource.properties.iter().find(|p| p.key == "id");
+
+        has_uid
+            && type_prop.map(|p| p.value.as_str()) == Some("Script")
+            && id_prop.map(|p| p.value.as_str()) == Some(script_resource_id)
+    });
 
     if optional_external_script_resource.is_none() {
         is_valid = false
     } else {
         let script_resource = optional_external_script_resource.unwrap();
-        let script_path = match script_resource.header_properties.get("path") {
+        let script_path = match script_resource.properties.iter().find(|p| p.key == "path") {
             None => "".to_owned(),
-            Some(path) => path.trim_start_matches("res://").to_owned(),
+            Some(prop) => prop.value.trim_start_matches("res://").to_owned(),
         };
         if script_path.is_empty() {
             is_valid = false

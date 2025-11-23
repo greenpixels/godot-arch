@@ -75,11 +75,21 @@ dependencies = [
  "colored",
  "convert_case",
  "glob-match",
+ "godot-properties-parser",
  "lazy_static",
  "predicates",
  "serde",
  "serde_yaml",
  "winapi",
+]
+
+[[package]]
+name = "godot-properties-parser"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0afb693bae655dec3f3067128e7743a1527c470d0c99bed968db67f81c780cf8"
+dependencies = [
+ "nom",
 ]
 
 [[package]]
@@ -115,6 +125,15 @@ name = "memchr"
 version = "2.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f52b00d39961fc5b2736ea853c9cc86238e165017a493d1d5c8eac6bdc4cc273"
+
+[[package]]
+name = "nom"
+version = "8.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "df9761775871bdef83bee530e60050f7e54b1105350d6884eb0fb4f46c2f9405"
+dependencies = [
+ "memchr",
+]
 
 [[package]]
 name = "normalize-line-endings"

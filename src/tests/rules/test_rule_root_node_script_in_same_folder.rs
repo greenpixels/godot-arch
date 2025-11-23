@@ -21,7 +21,7 @@ fn assert_results(script_path: &str, expected_files_tested: i32, expected_files_
         ));
 
     parsed_scene
-        .external_resources
+        .ext_resources
         .push(get_scene_external_resource(script_path, "myverycooltestid"));
 
     execute_rule_root_node_script_in_same_folder(
