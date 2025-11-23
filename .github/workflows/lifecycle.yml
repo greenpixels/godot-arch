@@ -23,6 +23,12 @@ jobs:
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
+        id: rust-toolchain
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ${{ steps.rust-toolchain.outputs.cachekey }}
 
       - name: Build for Linux
         run: cargo build --release
@@ -40,6 +46,12 @@ jobs:
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
+        id: rust-toolchain
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ${{ steps.rust-toolchain.outputs.cachekey }}
 
       - name: Build for Windows
         run: cargo build --release
@@ -57,8 +69,14 @@ jobs:
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
+        id: rust-toolchain
         with:
           components: rustfmt, clippy
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ${{ steps.rust-toolchain.outputs.cachekey }}
 
       - name: Check formatting
         run: cargo fmt --check
