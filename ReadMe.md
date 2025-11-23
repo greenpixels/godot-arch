@@ -188,7 +188,3 @@ includePatterns:
 - Move the script of the affected root node next to the root node
 - Reconfigure `includePatterns:` -> `rule-root-node-script-in-same-folder:` to reflect your preferred changes
 - Add this file or all files to `ignorePatterns:` -> `rule-root-node-script-in-same-folder:`
-
-## Planned Features
-
-- Scripts and Scenes configured as autoload in project settings are actually inside of autoload and vice versa
