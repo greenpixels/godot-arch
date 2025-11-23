@@ -1,0 +1,45 @@
+name: Setup Rust with Cache
+description: Sets up Rust toolchain with caching for both toolchain and dependencies
+
+inputs:
+  components:
+    description: Additional components to install (e.g., rustfmt, clippy)
+    required: false
+    default: ''
+
+outputs:
+  cachekey:
+    description: Cache key for the installed Rust toolchain
+    value: ${{ steps.rust-toolchain.outputs.cachekey }}
+
+runs:
+  using: composite
+  steps:
+    - name: Cache Rust toolchain
+      uses: actions/cache@v4
+      shell: bash
+      with:
+        path: |
+          ${{ runner.os == 'Windows' && '~\.rustup\toolchains' || '~/.rustup/toolchains' }}
+          ${{ runner.os == 'Windows' && '~\.rustup\update-hashes' || '~/.rustup/update-hashes' }}
+          ${{ runner.os == 'Windows' && '~\.rustup\settings.toml' || '~/.rustup/settings.toml' }}
+        key: ${{ runner.os }}-rustup${{ inputs.components && '-with-components' || '' }}
+
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@stable
+      id: rust-toolchain
+      with:
+        components: ${{ inputs.components }}
+
+    - name: Cache cargo dependencies
+      uses: actions/cache@v4
+      shell: bash
+      with:
+        path: |
+          ${{ runner.os == 'Windows' && '~\.cargo\registry' || '~/.cargo/registry' }}
+          ${{ runner.os == 'Windows' && '~\.cargo\git' || '~/.cargo/git' }}
+          target
+        key: ${{ runner.os }}-cargo-${{ steps.rust-toolchain.outputs.cachekey }}-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-${{ steps.rust-toolchain.outputs.cachekey }}-
+          ${{ runner.os }}-cargo-

@@ -22,23 +22,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache Rust toolchain
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.rustup/toolchains
-            ~/.rustup/update-hashes
-            ~/.rustup/settings.toml
-          key: ${{ runner.os }}-rustup
-
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
-        id: rust-toolchain
-
-      - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@v2
-        with:
-          shared-key: ${{ steps.rust-toolchain.outputs.cachekey }}
+      - name: Setup Rust with cache
+        uses: ./.github/actions/setup-rust-with-cache
 
       - name: Build for Linux
         run: cargo build --release
@@ -54,23 +39,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache Rust toolchain
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~\.rustup\toolchains
-            ~\.rustup\update-hashes
-            ~\.rustup\settings.toml
-          key: ${{ runner.os }}-rustup
-
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
-        id: rust-toolchain
-
-      - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@v2
-        with:
-          shared-key: ${{ steps.rust-toolchain.outputs.cachekey }}
+      - name: Setup Rust with cache
+        uses: ./.github/actions/setup-rust-with-cache
 
       - name: Build for Windows
         run: cargo build --release
@@ -86,25 +56,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache Rust toolchain
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.rustup/toolchains
-            ~/.rustup/update-hashes
-            ~/.rustup/settings.toml
-          key: ${{ runner.os }}-rustup-stable
-
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
-        id: rust-toolchain
+      - name: Setup Rust with cache
+        uses: ./.github/actions/setup-rust-with-cache
         with:
           components: rustfmt, clippy
-
-      - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@v2
-        with:
-          shared-key: ${{ steps.rust-toolchain.outputs.cachekey }}
 
       - name: Check formatting
         run: cargo fmt --check
