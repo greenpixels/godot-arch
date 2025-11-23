@@ -17,7 +17,6 @@ runs:
   steps:
     - name: Cache Rust toolchain
       uses: actions/cache@v4
-      shell: bash
       with:
         path: |
           ${{ runner.os == 'Windows' && '~\.rustup\toolchains' || '~/.rustup/toolchains' }}
@@ -33,7 +32,6 @@ runs:
 
     - name: Cache cargo dependencies
       uses: actions/cache@v4
-      shell: bash
       with:
         path: |
           ${{ runner.os == 'Windows' && '~\.cargo\registry' || '~/.cargo/registry' }}
