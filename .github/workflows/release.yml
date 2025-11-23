@@ -7,6 +7,7 @@ on:
 jobs:
   lifecycle:
     uses: ./.github/workflows/lifecycle.yml
+    secrets: inherit
 
   prepare-linux:
     needs: [lifecycle]
