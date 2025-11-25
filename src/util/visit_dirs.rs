@@ -5,8 +5,8 @@ use std::{
 };
 
 use crate::{
-    models::{config::Config, test_results::TestResults},
-    normalize_path,
+    interface::config::Config, reporting::test_results::TestResults,
+    util::normalize_path::normalize_path,
 };
 use glob_match::glob_match;
 

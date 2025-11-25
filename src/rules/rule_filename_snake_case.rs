@@ -2,9 +2,10 @@ use colored::Colorize;
 use convert_case::{Case, Casing};
 
 use crate::{
-    models::{config::Config, file_under_test::FileUnderTest, test_results::TestResults},
+    interface::config::Config, reporting::test_results::TestResults,
     rules::handle_validation_result::handle_validation_result,
     util::should_ignore_rule_for_file::should_ignore_rule_for_file,
+    validation::file_under_test::FileUnderTest,
 };
 
 pub fn execute_rule_filename_snake_case(

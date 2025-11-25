@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use crate::models::{report_entry::ReportEntry, warning::Warning};
+use crate::reporting::{report_entry::ReportEntry, warning::Warning};
 
 #[derive(Serialize)]
 pub struct TestResults {

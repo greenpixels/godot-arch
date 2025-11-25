@@ -1,0 +1,64 @@
+use colored::Colorize;
+use std::fs::DirEntry;
+
+use crate::interface::config::Config;
+use crate::reporting::test_results::TestResults;
+use crate::rules::rule_allowed_file_location::execute_rule_allowed_file_location;
+use crate::rules::rule_filename_snake_case::execute_rule_filename_snake_case;
+use crate::rules::rule_parent_has_same_name::execute_rule_parent_has_same_name;
+use crate::util::normalize_path::normalize_path;
+use crate::validation::file_under_test::FileUnderTest;
+use crate::validation::scene_validator::validate_scene_nodes;
+
+pub fn handle_file(
+    input_path_string: &str,
+    entry: &DirEntry,
+    test_results: &mut TestResults,
+    config: &Config,
+) {
+    let path = entry.path();
+    let full_path = path.to_str().unwrap_or("");
+    let file_name = path
+        .file_name()
+        .and_then(|comp| comp.to_str())
+        .unwrap_or("");
+    let extension = path.extension().and_then(|ext| ext.to_str()).unwrap_or("");
+
+    let file_under_test = FileUnderTest {
+        file_name: file_name.to_owned(),
+        path: path.to_owned(),
+        extension: extension.to_owned(),
+        absolute_path: path
+            .canonicalize()
+            .unwrap()
+            .to_str()
+            .unwrap_or("")
+            .to_owned(),
+        relative_path: normalize_path(
+            full_path
+                .strip_prefix(input_path_string)
+                .unwrap_or(file_name),
+        ),
+    };
+
+    let previous_fails = test_results.files_failed;
+    let previous_tests = test_results.files_tested;
+
+    execute_rule_allowed_file_location(&file_under_test, config, test_results);
+    execute_rule_filename_snake_case(&file_under_test, config, test_results);
+    execute_rule_parent_has_same_name(&file_under_test, config, test_results);
+
+    if extension == "tscn" {
+        validate_scene_nodes(&file_under_test, test_results, config);
+    }
+
+    if previous_tests != test_results.files_tested
+        && (test_results.files_failed > previous_fails || config.should_print_success)
+    {
+        println!(
+            ">>>\t{} errors in {} ...\n\n",
+            test_results.files_failed - previous_fails,
+            file_under_test.relative_path.yellow()
+        );
+    }
+}

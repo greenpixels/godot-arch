@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
-    models::config::Config,
+    interface::config::Config,
     rules::rule_scene_nodes_pascal_case::execute_rule_scene_needs_pascal_case,
     tests::mocks::{get_config_mock, get_file_under_test_mock, get_test_results_mock},
 };

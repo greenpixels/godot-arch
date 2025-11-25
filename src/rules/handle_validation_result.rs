@@ -1,6 +1,7 @@
 use colored::Colorize;
 
-use crate::models::{file_under_test::FileUnderTest, report_entry::ReportEntry};
+use crate::reporting::report_entry::ReportEntry;
+use crate::validation::file_under_test::FileUnderTest;
 
 fn strip_ansi_codes(text: &str) -> String {
     let ansi_regex = regex::Regex::new(r"\x1b\[[0-9;]*m").unwrap();
@@ -13,7 +14,7 @@ pub fn handle_validation_result(
     success_message: String,
     error_message: String,
     should_print_success: bool,
-    test_results: &mut crate::models::test_results::TestResults,
+    test_results: &mut crate::reporting::test_results::TestResults,
     file_under_test: &FileUnderTest,
 ) -> Option<String> {
     test_results.files_tested += 1;

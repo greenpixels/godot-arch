@@ -1,4 +1,5 @@
-use crate::models::{config::Config, file_under_test::FileUnderTest};
+use crate::interface::config::Config;
+use crate::validation::file_under_test::FileUnderTest;
 use glob_match::glob_match;
 
 pub fn should_ignore_rule_for_file(
