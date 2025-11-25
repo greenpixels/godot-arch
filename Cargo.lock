@@ -178,9 +178,9 @@ dependencies = [
 
 [[package]]
 name = "godot-properties-parser"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f139c16dcf21d36ee0e1d29401cc9689541b17263d372699d9a30e2ec3488059"
+checksum = "e14aca5c6d0acc7006438a9967aeaa88a624ec41730184f184b2e23d207ccbdf"
 dependencies = [
  "nom",
 ]
