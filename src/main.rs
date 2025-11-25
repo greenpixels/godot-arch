@@ -1,8 +1,9 @@
+use clap::{Parser, arg};
 use colored::Colorize;
 use godot_properties_parser::parse_scene_file;
 use std::fs::{DirEntry, exists};
 use std::path::Path;
-use std::{env, io, vec};
+use std::{io, vec};
 mod models;
 mod rules;
 #[cfg(test)]
@@ -25,28 +26,48 @@ use crate::util::{
     ansi::enable_ansi_support, normalize_path::normalize_path, visit_dirs::visit_dirs,
 };
 
-fn load_config() -> Config {
-    let args: Vec<String> = env::args().collect();
-    let configuration_path: &str = if args.len() > 1 {
-        &args[1]
-    } else {
-        "godot-arch.config.yaml"
-    };
-    let config_content =
-        std::fs::read_to_string(configuration_path).expect("Failed to read config file");
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    /// Path to godot project root
+    #[arg(short = 'p', long = "project", default_value_t = String::from("./"))]
+    project_path: String,
+
+    /// Path to configuration file
+    #[arg(
+        short = 'c',
+        long = "config",
+        default_value_t = String::from("./godot-arch.config.yaml")
+    )]
+    config_path: String,
+
+    /// Location in which to save a report in
+    #[arg(long = "report", default_value_t = String::from("./"))]
+    report_location: String,
+}
+
+fn load_config(path: String) -> Config {
+    let config_content = std::fs::read_to_string(path).expect("Failed to read config file");
     serde_yaml::from_str(&config_content).expect("Failed to parse config file")
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     enable_ansi_support();
-    let config: Config = load_config();
+    let Args {
+        config_path,
+        project_path,
+        report_location,
+    } = Args::parse();
+    let config: Config = load_config(config_path);
     let start_time = std::time::Instant::now();
-    let path_string: &str = config.project_path.as_str();
+    let path_string: &str = &project_path;
     let path = Path::new(path_string);
     let mut test_results: TestResults = TestResults {
         files_tested: 0,
         files_failed: 0,
         warnings: vec![],
+        failed_reports: vec![],
+        successful_reports: vec![],
     };
 
     if exists(path).is_err() {
@@ -81,9 +102,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         io::stdin().read_line(&mut String::new()).unwrap();
     }
 
+    let report_path = Path::new(&report_location).join("godot-arch-report.json");
+    println!("{}{}", "Writing report to ", report_path.display());
+    match serde_json::to_string_pretty(&test_results) {
+        Ok(report_json) => {
+            if let Some(parent) = Path::new(&report_path).parent() {
+                if let Err(e) = std::fs::create_dir_all(parent) {
+                    eprintln!("Failed to create report directory: {}", e);
+                }
+            }
+            if let Err(e) = std::fs::write(&report_path, report_json) {
+                eprintln!("Failed to write report file: {}", e);
+            }
+        }
+        Err(e) => {
+            eprintln!("Failed to serialize report: {}", e);
+        }
+    }
+
     if test_results.files_failed != 0 {
         return Err("Some tests were not successful".into());
     }
+
     Ok(())
 }
 

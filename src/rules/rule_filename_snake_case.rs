@@ -38,6 +38,7 @@ pub fn execute_rule_filename_snake_case(
         ),
         config.should_print_success,
         test_results,
+        file,
     );
     if validation_output.is_some() {
         println!("{}", validation_output.unwrap())

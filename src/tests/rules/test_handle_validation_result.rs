@@ -1,6 +1,9 @@
 use predicates::*;
 
-use crate::{rules::handle_validation_result, tests::mocks::get_test_results_mock};
+use crate::{
+    rules::handle_validation_result,
+    tests::mocks::{get_file_under_test_mock, get_test_results_mock},
+};
 
 #[test]
 fn test_should_correctly_handle_failed_validation() {
@@ -12,6 +15,7 @@ fn test_should_correctly_handle_failed_validation() {
         String::new(),
         true,
         &mut test_results,
+        &get_file_under_test_mock("folder", "file_is_snake_case", "tscn"),
     );
     let predicate = prelude::predicate::str::contains("Failed").count(1);
     assert_eq!(true, validation_result.is_some());
@@ -30,6 +34,7 @@ fn test_should_correctly_handle_successful_validation() {
         String::new(),
         true,
         &mut test_results,
+        &get_file_under_test_mock("folder", "file_is_snake_case", "tscn"),
     );
     let predicate = prelude::predicate::str::contains("Succesful").count(1);
     assert_eq!(true, validation_result.is_some());
@@ -48,6 +53,7 @@ fn test_should_not_output_on_success_when_flag_is_false() {
         String::new(),
         false,
         &mut test_results,
+        &get_file_under_test_mock("folder", "file_is_snake_case", "tscn"),
     );
     assert_eq!(true, !validation_result.is_some());
 }
@@ -62,6 +68,7 @@ fn test_should_output_on_failed_when_flag_is_false() {
         String::new(),
         false,
         &mut test_results,
+        &get_file_under_test_mock("folder", "file_is_snake_case", "tscn"),
     );
     let predicate = prelude::predicate::str::contains("Failed").count(1);
     assert_eq!(true, validation_result.is_some());

@@ -48,6 +48,7 @@ pub fn execute_rule_node_depth_fits_max_depth(
         ),
         config.should_print_success,
         test_results,
+        file,
     );
     if validation_output.is_some() {
         println!("{}", validation_output.unwrap())

@@ -53,6 +53,7 @@ pub fn execute_rule_allowed_file_location(
         ),
         config.should_print_success,
         test_results,
+        file,
     );
     if validation_output.is_some() {
         println!("{}", validation_output.unwrap())

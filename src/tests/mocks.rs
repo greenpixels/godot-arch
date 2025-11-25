@@ -11,6 +11,8 @@ pub fn get_test_results_mock() -> TestResults {
         files_tested: 0,
         files_failed: 0,
         warnings: vec![],
+        failed_reports: vec![],
+        successful_reports: vec![],
     };
 }
 

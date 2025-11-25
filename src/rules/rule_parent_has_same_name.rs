@@ -44,6 +44,7 @@ pub fn execute_rule_parent_has_same_name(
         ),
         config.should_print_success,
         test_results,
+        file,
     );
     if validation_output.is_some() {
         println!("{}", validation_output.unwrap())
