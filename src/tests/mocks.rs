@@ -52,7 +52,6 @@ pub fn get_config_mock() -> Config {
             node_depth_fits_max_depth: vec!["./**".to_owned()],
         },
         node_name_pascal_case_exceptions: vec![],
-        project_path: ".".to_string(),
         should_print_success: true,
         wait_for_input_before_close: false,
         max_node_depth: 4,

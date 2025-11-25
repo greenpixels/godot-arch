@@ -22,19 +22,12 @@ pub struct Config {
     #[serde(default)]
     #[serde(rename = "shouldPrintSuccess")]
     pub should_print_success: bool,
-    #[serde(default = "default_project_path")]
-    #[serde(rename = "projectPath")]
-    pub project_path: String,
     #[serde(rename = "waitForInputBeforeClose")]
     #[serde(default)]
     pub wait_for_input_before_close: bool,
     #[serde(rename = "maxNodeDepth")]
     #[serde(default = "default_max_node_depth")]
     pub max_node_depth: usize,
-}
-
-fn default_project_path() -> String {
-    ".".to_owned()
 }
 
 fn default_max_node_depth() -> usize {
