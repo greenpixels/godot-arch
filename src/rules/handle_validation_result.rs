@@ -4,7 +4,7 @@ use crate::models::{file_under_test::FileUnderTest, report_entry::ReportEntry};
 
 fn strip_ansi_codes(text: &str) -> String {
     let ansi_regex = regex::Regex::new(r"\x1b\[[0-9;]*m").unwrap();
-    return ansi_regex.replace_all(text, "").to_string();
+    ansi_regex.replace_all(text, "").to_string()
 }
 
 pub fn handle_validation_result(

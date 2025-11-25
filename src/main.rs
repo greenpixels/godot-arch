@@ -104,13 +104,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     if let Some(report_location) = report_location {
         let report_path = Path::new(&report_location).join("godot-arch-report.json");
-        println!("{}{}", "Writing report to ", report_path.display());
+        println!("Writing report to {}", report_path.display());
         match serde_json::to_string_pretty(&test_results) {
             Ok(report_json) => {
-                if let Some(parent) = Path::new(&report_path).parent() {
-                    if let Err(e) = std::fs::create_dir_all(parent) {
-                        eprintln!("Failed to create report directory: {}", e);
-                    }
+                if let Some(parent) = Path::new(&report_path).parent()
+                    && let Err(e) = std::fs::create_dir_all(parent)
+                {
+                    eprintln!("Failed to create report directory: {}", e);
                 }
                 if let Err(e) = std::fs::write(&report_path, report_json) {
                     eprintln!("Failed to write report file: {}", e);
