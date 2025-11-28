@@ -57,6 +57,7 @@ pub fn get_config_mock() -> Config {
         should_print_success: true,
         wait_for_input_before_close: false,
         max_node_depth: 4,
+        allowed_custom_resource_locations: HashMap::new(),
     };
 }
 

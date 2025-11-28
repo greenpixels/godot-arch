@@ -1,14 +1,17 @@
 use colored::Colorize;
+use godot_properties_parser::{parse_property_file, parse_scene_file};
 use std::fs::DirEntry;
 
 use crate::interface::config::Config;
 use crate::reporting::test_results::TestResults;
+use crate::reporting::warning::Warning;
 use crate::rules::rule_allowed_file_location::execute_rule_allowed_file_location;
 use crate::rules::rule_filename_snake_case::execute_rule_filename_snake_case;
 use crate::rules::rule_parent_has_same_name::execute_rule_parent_has_same_name;
 use crate::util::normalize_path::normalize_path;
 use crate::validation::file_under_test::FileUnderTest;
-use crate::validation::scene_validator::validate_scene_nodes;
+use crate::validation::resource_validator::validate_resource_file;
+use crate::validation::scene_validator::validate_scene_file;
 
 pub fn handle_file(
     input_path_string: &str,
@@ -48,8 +51,46 @@ pub fn handle_file(
     execute_rule_filename_snake_case(&file_under_test, config, test_results);
     execute_rule_parent_has_same_name(&file_under_test, config, test_results);
 
-    if extension == "tscn" {
-        validate_scene_nodes(&file_under_test, test_results, config);
+    if extension == "tscn" || extension == "tres" {
+        let file_content = match std::fs::read_to_string(&file_under_test.absolute_path) {
+            Ok(content) => content,
+            Err(_) => {
+                test_results.warnings.push(Warning {
+                    absolute_path: file_under_test.absolute_path.clone(),
+                    message: String::from("Unable to read scene file"),
+                });
+                return;
+            }
+        };
+        match extension {
+            "tscn" => {
+                match parse_scene_file(&file_content) {
+                    Err(_warning) => {
+                        test_results.warnings.push(Warning {
+                            absolute_path: file_under_test.absolute_path.clone(),
+                            message: String::from("Unable to parse scene file"),
+                        });
+                        return;
+                    }
+                    Ok((_, scene_file)) => {
+                        validate_scene_file(scene_file, &file_under_test, test_results, config)
+                    }
+                };
+            }
+            "tres" => match parse_property_file(&file_content) {
+                Err(_warning) => {
+                    test_results.warnings.push(Warning {
+                        absolute_path: file_under_test.absolute_path.clone(),
+                        message: String::from("Unable to parse scene file"),
+                    });
+                    return;
+                }
+                Ok((_, resource_file)) => {
+                    validate_resource_file(resource_file, &file_under_test, test_results, config)
+                }
+            },
+            _ => (),
+        }
     }
 
     if previous_tests != test_results.files_tested

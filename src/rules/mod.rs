@@ -1,4 +1,5 @@
 pub mod handle_validation_result;
+pub mod rule_allowed_custom_resource_location;
 pub mod rule_allowed_file_location;
 pub mod rule_filename_snake_case;
 pub mod rule_node_depth_fits_max_depth;

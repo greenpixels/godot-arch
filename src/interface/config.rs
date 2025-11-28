@@ -14,6 +14,9 @@ pub struct Config {
     #[serde(rename = "allowedFileLocations")]
     pub allowed_file_locations: HashMap<String, Vec<String>>,
     #[serde(default)]
+    #[serde(rename = "allowedCustomResourceLocations")]
+    pub allowed_custom_resource_locations: HashMap<String, Vec<String>>,
+    #[serde(default)]
     #[serde(rename = "nodeNamePascalCaseExceptions")]
     pub node_name_pascal_case_exceptions: Vec<HashMap<String, String>>,
     #[serde(default)]
@@ -41,6 +44,9 @@ pub struct IgnorePatterns {
     #[serde(rename = "rule-allowed-file-location")]
     #[serde(default)]
     pub allowed_file_location: Vec<String>,
+    #[serde(rename = "rule-allowed-custom-resource-location")]
+    #[serde(default)]
+    pub allowed_custom_resource_location: Vec<String>,
     #[serde(rename = "rule-filename-snake-case")]
     #[serde(default)]
     pub filename_snake_case: Vec<String>,

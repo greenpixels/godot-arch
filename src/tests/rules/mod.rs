@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod test_handle_validation_result;
+mod test_rule_allowed_custom_resource_location;
 mod test_rule_allowed_file_location;
 mod test_rule_filename_scake_case;
 mod test_rule_node_depth_fits_max_depth;
