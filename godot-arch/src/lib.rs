@@ -3,7 +3,7 @@ use std::fs::exists;
 use std::path::Path;
 use std::{io, vec};
 
-mod interface;
+pub mod interface;
 mod reporting;
 mod rules;
 #[cfg(test)]

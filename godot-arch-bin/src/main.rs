@@ -1,16 +1,8 @@
 use colored::Colorize;
-use godot_arch::run_godot_arch;
+use godot_arch::{run_godot_arch, interface::cli::Args};
 
-mod interface;
-mod reporting;
-mod rules;
-#[cfg(test)]
-mod tests;
 mod util;
-mod validation;
-
-use crate::interface::cli::Args;
-use crate::util::ansi::enable_ansi_support;
+use util::ansi::enable_ansi_support;
 
 fn main() {
     enable_ansi_support();
