@@ -23,12 +23,12 @@ pub fn execute_rule_allowed_file_location(
     }
 
     let mut in_correct_root = false;
-    let mut can_skip = true;
+    let mut has_path_entry = false;
     let mut matched_locations: Vec<String> = vec![];
 
     for (pattern, locations) in config.allowed_file_locations.iter() {
         if glob_match(pattern, &file.relative_path) {
-            can_skip = false;
+            has_path_entry = true;
             for location in locations {
                 matched_locations.push(location.to_owned());
                 if glob_match(location, &file.relative_path) {
@@ -37,7 +37,7 @@ pub fn execute_rule_allowed_file_location(
             }
         }
     }
-    if can_skip {
+    if !has_path_entry {
         return;
     }
     let folders_list = matched_locations.join(" or ");

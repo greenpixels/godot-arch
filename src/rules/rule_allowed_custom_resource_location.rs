@@ -29,12 +29,12 @@ pub fn execute_rule_allowed_custom_resource_location(
     }
 
     let mut in_correct_root = false;
-    let mut can_skip = true;
+    let mut has_rule_entry = false;
     let mut matched_locations: Vec<String> = vec![];
 
     for (custom_resource_class_name, locations) in config.allowed_custom_resource_locations.iter() {
         if resource_name.eq(custom_resource_class_name) {
-            can_skip = false;
+            has_rule_entry = true;
             for location in locations {
                 matched_locations.push(location.to_owned());
                 if glob_match(location, &file.relative_path) {
@@ -43,7 +43,7 @@ pub fn execute_rule_allowed_custom_resource_location(
             }
         }
     }
-    if can_skip {
+    if !has_rule_entry {
         return;
     }
     let folders_list = matched_locations.join(" or ");
