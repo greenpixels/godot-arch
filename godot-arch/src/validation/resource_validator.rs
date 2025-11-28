@@ -1,6 +1,6 @@
 use godot_properties_parser::parsers::parser_property_file::PropertyFile;
 
-use crate::interface::config::Config;
+use crate::config::config::Config;
 use crate::reporting::test_results::TestResults;
 use crate::rules::rule_allowed_custom_resource_location::execute_rule_allowed_custom_resource_location;
 use crate::validation::file_under_test::FileUnderTest;

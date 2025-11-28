@@ -3,7 +3,7 @@ use std::fs::exists;
 use std::path::Path;
 use std::{io, vec};
 
-pub mod interface;
+pub mod config;
 mod reporting;
 mod rules;
 #[cfg(test)]
@@ -11,11 +11,12 @@ mod tests;
 mod util;
 mod validation;
 
-use crate::interface::config::load_config;
+use crate::config::config::load_config;
 use crate::reporting::print_summary::print_summary;
 use crate::reporting::print_warnings::print_warnings;
 use crate::reporting::report_writer::write_report;
 use crate::reporting::test_results::TestResults;
+use crate::util::ansi::enable_ansi_support;
 use crate::util::visit_dirs::visit_dirs;
 use crate::validation::process_file::process_file;
 
@@ -24,6 +25,7 @@ pub fn run_godot_arch(
     project_path: &str,
     report_location: Option<String>,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    enable_ansi_support();
     let config = load_config(&config_path)?;
     let start_time = std::time::Instant::now();
 

@@ -2,7 +2,7 @@ use colored::Colorize;
 use glob_match::glob_match;
 
 use crate::{
-    interface::config::Config, reporting::test_results::TestResults,
+    config::config::Config, reporting::test_results::TestResults,
     rules::handle_validation_result::handle_validation_result,
     util::should_ignore_rule_for_file::should_ignore_rule_for_file,
     validation::file_under_test::FileUnderTest,

@@ -2,7 +2,7 @@ use colored::Colorize;
 use godot_properties_parser::{parse_property_file, parse_scene_file};
 use std::fs::DirEntry;
 
-use crate::interface::config::Config;
+use crate::config::config::Config;
 use crate::reporting::test_results::TestResults;
 use crate::reporting::warning::Warning;
 use crate::rules::rule_allowed_file_location::execute_rule_allowed_file_location;

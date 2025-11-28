@@ -1,9 +1,6 @@
 [workspace]
-name = "godot-arch"
-version = "0.6.0"
-edition = "2024"
-license = "MIT"
-members = ["godot-arch","godot-arch-bin"]
+members = ["godot-arch","godot-arch-cli"]
+resolver = "3"
 
 [workspace.dependencies]
 colored = "3.0.0"

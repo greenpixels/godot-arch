@@ -1,12 +1,9 @@
-use colored::Colorize;
-use godot_arch::{run_godot_arch, interface::cli::Args};
+use godot_arch::run_godot_arch;
 
-mod util;
-use util::ansi::enable_ansi_support;
+mod interface;
+use interface::cli::Args;
 
 fn main() {
-    enable_ansi_support();
-
     let Args {
         config_path,
         project_path,

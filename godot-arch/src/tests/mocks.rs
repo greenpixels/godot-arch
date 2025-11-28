@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::{path::PathBuf, vec};
 
-use crate::interface::config::Config;
+use crate::config::config::Config;
 use crate::reporting::test_results::TestResults;
 use crate::validation::file_under_test::FileUnderTest;
 use godot_properties_parser::parsers::{
@@ -42,10 +42,10 @@ pub fn get_config_mock() -> Config {
     return Config {
         allow_screaming_snake_case_in_node_names: false,
         allowed_file_locations: HashMap::new(),
-        ignore_patterns: crate::interface::config::IgnorePatterns {
+        ignore_patterns: crate::config::config::IgnorePatterns {
             ..Default::default()
         },
-        include_patterns: crate::interface::config::IncludePatterns {
+        include_patterns: crate::config::config::IncludePatterns {
             filename_snake_case: vec!["./**".to_owned()],
             parent_has_same_name: vec!["./**".to_owned()],
             scene_nodes_pascal_case: vec!["./**".to_owned()],
