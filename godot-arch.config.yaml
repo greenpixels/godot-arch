@@ -1,6 +1,4 @@
 includePatterns:
-    "rule-allowed-file-location":
-        - ./**
     "rule-filename-snake-case":
         - ./**
     "rule-parent-has-same-name":
