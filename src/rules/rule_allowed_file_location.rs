@@ -22,28 +22,30 @@ pub fn execute_rule_allowed_file_location(
         return;
     }
 
-    let mut in_correct_root = false;
-    let mut has_path_entry = false;
-    let mut matched_locations: Vec<String> = vec![];
+    let mut is_in_correct_location = false;
+    let mut matched_allowed_locations: Vec<String> = vec![];
 
+    // Check if file matches any configured patterns
     for (pattern, locations) in config.allowed_file_locations.iter() {
         if glob_match(pattern, &file.relative_path) {
-            has_path_entry = true;
             for location in locations {
-                matched_locations.push(location.to_owned());
+                matched_allowed_locations.push(location.to_owned());
                 if glob_match(location, &file.relative_path) {
-                    in_correct_root = true;
+                    is_in_correct_location = true;
+                    break;
                 }
             }
         }
     }
-    if !has_path_entry {
+
+    if matched_allowed_locations.is_empty() {
         return;
     }
-    let folders_list = matched_locations.join(" or ");
+
+    let folders_list = matched_allowed_locations.join(" or ");
 
     let validation_output = handle_validation_result(
-        in_correct_root,
+        is_in_correct_location,
         "rule-allowed-file-location".to_owned(),
         format!("Found {} in correct location", file.file_name.bold()),
         format!(
@@ -56,7 +58,8 @@ pub fn execute_rule_allowed_file_location(
         test_results,
         file,
     );
-    if validation_output.is_some() {
-        println!("{}", validation_output.unwrap())
+
+    if let Some(output) = validation_output {
+        println!("{}", output);
     }
 }

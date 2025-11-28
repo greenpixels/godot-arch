@@ -29,24 +29,26 @@ pub fn execute_rule_allowed_custom_resource_location(
     }
 
     let mut in_correct_root = false;
-    let mut has_rule_entry = false;
-    let mut matched_locations: Vec<String> = vec![];
+    let mut matched_allowed_locations: Vec<String> = vec![];
 
+    // Check if file matches any configured patterns
     for (custom_resource_class_name, locations) in config.allowed_custom_resource_locations.iter() {
         if resource_name.eq(custom_resource_class_name) {
-            has_rule_entry = true;
             for location in locations {
-                matched_locations.push(location.to_owned());
+                matched_allowed_locations.push(location.to_owned());
                 if glob_match(location, &file.relative_path) {
                     in_correct_root = true;
+                    break;
                 }
             }
         }
     }
-    if !has_rule_entry {
+
+    if matched_allowed_locations.is_empty() {
         return;
     }
-    let folders_list = matched_locations.join(" or ");
+
+    let folders_list = matched_allowed_locations.join(" or ");
 
     let validation_output = handle_validation_result(
         in_correct_root,
