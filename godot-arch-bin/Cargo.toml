@@ -1,0 +1,8 @@
+[package]
+name = "godot-arch-bin"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+colored = {workspace = true }
+godot-arch = { path = "../godot-arch" }
