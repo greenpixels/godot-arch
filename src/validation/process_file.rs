@@ -10,10 +10,9 @@ use crate::rules::rule_filename_snake_case::execute_rule_filename_snake_case;
 use crate::rules::rule_parent_has_same_name::execute_rule_parent_has_same_name;
 use crate::util::normalize_path::normalize_path;
 use crate::validation::file_under_test::FileUnderTest;
-use crate::validation::resource_validator::validate_resource_file;
 use crate::validation::scene_validator::validate_scene_file;
 
-pub fn handle_file(
+pub fn process_file(
     input_path_string: &str,
     entry: &DirEntry,
     test_results: &mut TestResults,
@@ -85,9 +84,12 @@ pub fn handle_file(
                     });
                     return;
                 }
-                Ok((_, resource_file)) => {
-                    validate_resource_file(resource_file, &file_under_test, test_results, config)
-                }
+                Ok((_, resource_file)) => super::resource_validator::validate_resource_file(
+                    resource_file,
+                    &file_under_test,
+                    test_results,
+                    config,
+                ),
             },
             _ => (),
         }

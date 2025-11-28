@@ -87,3 +87,9 @@ pub struct IncludePatterns {
     #[serde(default)]
     pub node_depth_fits_max_depth: Vec<String>,
 }
+
+pub fn load_config(path: &str) -> Result<Config, Box<dyn std::error::Error>> {
+    let config_content = std::fs::read_to_string(path)?;
+    let config = serde_yaml::from_str(&config_content)?;
+    Ok(config)
+}
