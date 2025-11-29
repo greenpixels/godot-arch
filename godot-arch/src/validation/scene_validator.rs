@@ -1,6 +1,6 @@
 use godot_properties_parser::parsers::parser_scene_file::SceneFile;
 
-use crate::config::config::Config;
+use crate::configuration::config::Config;
 use crate::reporting::test_results::TestResults;
 use crate::rules::rule_node_depth_fits_max_depth::execute_rule_node_depth_fits_max_depth;
 use crate::rules::rule_root_node_is_file_name_pascal::execute_rule_root_node_is_file_name_pascal;

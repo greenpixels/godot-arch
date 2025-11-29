@@ -1,4 +1,4 @@
-use crate::config::config::Config;
+use crate::configuration::config::Config;
 use crate::validation::file_under_test::FileUnderTest;
 use glob_match::glob_match;
 

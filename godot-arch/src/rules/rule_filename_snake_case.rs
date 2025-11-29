@@ -2,7 +2,7 @@ use colored::Colorize;
 use convert_case::{Case, Casing};
 
 use crate::{
-    config::config::Config, reporting::test_results::TestResults,
+    configuration::config::Config, reporting::test_results::TestResults,
     rules::handle_validation_result::handle_validation_result,
     util::should_ignore_rule_for_file::should_ignore_rule_for_file,
     validation::file_under_test::FileUnderTest,

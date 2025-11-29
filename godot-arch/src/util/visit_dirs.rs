@@ -5,7 +5,7 @@ use std::{
 };
 
 use crate::{
-    config::config::Config, reporting::test_results::TestResults,
+    configuration::config::Config, reporting::test_results::TestResults,
     util::normalize_path::normalize_path,
 };
 use glob_match::glob_match;

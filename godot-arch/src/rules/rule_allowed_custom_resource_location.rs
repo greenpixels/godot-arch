@@ -2,7 +2,7 @@ use colored::Colorize;
 use glob_match::glob_match;
 
 use crate::{
-    config::config::Config, reporting::test_results::TestResults,
+    configuration::config::Config, reporting::test_results::TestResults,
     rules::handle_validation_result::handle_validation_result,
     util::should_ignore_rule_for_file::should_ignore_rule_for_file,
     validation::file_under_test::FileUnderTest,
@@ -44,9 +44,7 @@ pub fn execute_rule_allowed_custom_resource_location(
         }
     }
 
-    if matched_allowed_locations.is_empty()
-        && config.should_fail_unmatched_custom_resources == false
-    {
+    if matched_allowed_locations.is_empty() && !config.should_fail_unmatched_custom_resources {
         return;
     }
 
