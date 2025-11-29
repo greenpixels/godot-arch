@@ -162,13 +162,6 @@ ignorePatterns:
         - ./addons/**       # Third-party addons
 ```
 
-## Tips
-
-- Apply this rule to all `.tscn` files
-- Use with [Parent Has Same Name](./rule-parent-has-same-name.md)
-- Create a consistent folder-per-scene structure
-- Great for team projects
-
 ## Related Documentation
 
 - [Configuration Reference](../configuration.md)

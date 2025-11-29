@@ -24,7 +24,7 @@ pub fn run_godot_arch(
     config_path: &str,
     project_path: &str,
     report_location: Option<String>,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> Result<TestResults, Box<dyn std::error::Error>> {
     enable_ansi_support();
     let config = load_config(&config_path)?;
     let start_time = std::time::Instant::now();
@@ -56,19 +56,15 @@ pub fn run_godot_arch(
     let elapsed_time = start_time.elapsed();
     print_summary(&test_results, elapsed_time);
 
-    if let Some(ref location) = report_location
-        && let Err(e) = write_report(location, &test_results)
+    if let Some(location) = report_location
+        && let Err(e) = write_report(&location, &test_results)
     {
         eprintln!("Error writing report: {}", e);
-    }
-
-    if test_results.files_failed != 0 {
-        return Err("Some tests were not successful".into());
     }
 
     if config.wait_for_input_before_close {
         println!("\nPress any button to exit ...");
         io::stdin().read_line(&mut String::new()).unwrap();
     }
-    Ok(())
+    Ok(test_results)
 }

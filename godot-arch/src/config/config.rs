@@ -31,6 +31,9 @@ pub struct Config {
     #[serde(rename = "maxNodeDepth")]
     #[serde(default = "default_max_node_depth")]
     pub max_node_depth: usize,
+    #[serde(rename = "failUnmatchedCustomResources")]
+    #[serde(default)]
+    pub should_fail_unmatched_custom_resources: bool,
 }
 
 fn default_max_node_depth() -> usize {

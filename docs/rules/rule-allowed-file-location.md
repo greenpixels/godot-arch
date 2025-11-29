@@ -157,13 +157,6 @@ allowedFileLocations:
         - ./utils/**
 ```
 
-## Tips
-
-- Start broad and tighten restrictions as your project grows
-- Use the `overall` ignore pattern for third-party folders like `addons/`
-- Consider your team's workflow when defining locations
-- Document your chosen structure in your project's README
-
 ## Related Documentation
 
 - [Configuration Reference](../configuration.md)

@@ -10,7 +10,7 @@ fn assert_results(folder: &str, expected_files_tested: i32, expected_files_faile
     config
         .allowed_custom_resource_locations
         .insert("File".to_owned(), vec!["./files/**".to_owned()]);
-
+    config.should_fail_unmatched_custom_resources = true;
     execute_rule_allowed_custom_resource_location(
         "File",
         &file_under_test,
@@ -30,4 +30,21 @@ fn test_rule_should_pass_on_correct_folder() {
 #[test]
 fn test_rule_should_pass_on_incorrect_folder() {
     assert_results("notfiles/all", 1, 1);
+}
+
+#[test]
+fn test_rule_should_fail_on_unmatched_custom_resource() {
+    let mut test_results = get_test_results_mock();
+    let file_under_test = get_file_under_test_mock("files/all", "file", "tres");
+    let mut config = get_config_mock();
+    config.should_fail_unmatched_custom_resources = true;
+    execute_rule_allowed_custom_resource_location(
+        "UnmatchedFile",
+        &file_under_test,
+        &config,
+        &mut test_results,
+    );
+
+    assert_eq!(test_results.files_tested, 1);
+    assert_eq!(test_results.files_failed, 1);
 }

@@ -44,7 +44,9 @@ pub fn execute_rule_allowed_custom_resource_location(
         }
     }
 
-    if matched_allowed_locations.is_empty() {
+    if matched_allowed_locations.is_empty()
+        && config.should_fail_unmatched_custom_resources == false
+    {
         return;
     }
 
@@ -57,12 +59,20 @@ pub fn execute_rule_allowed_custom_resource_location(
             "Found Resource {} in correct location",
             resource_name.bold()
         ),
-        format!(
-            "Expected Resource {} to be in {}, but found it in {}",
-            resource_name.bold(),
-            folders_list.bold(),
-            file.relative_path.bold(),
-        ),
+        if matched_allowed_locations.is_empty() && config.should_fail_unmatched_custom_resources {
+            format!(
+                "Expected Resource {} to be included in {} configuration",
+                resource_name.bold(),
+                "allowedCustomResourceLocations".bold()
+            )
+        } else {
+            format!(
+                "Expected Resource {} to be in {}, but found it in {}",
+                resource_name.bold(),
+                folders_list.bold(),
+                file.relative_path.bold(),
+            )
+        },
         config.should_print_success,
         test_results,
         file,

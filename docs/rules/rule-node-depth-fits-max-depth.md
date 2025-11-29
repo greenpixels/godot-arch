@@ -212,14 +212,6 @@ ignorePatterns:
         - ./test/**
 ```
 
-## Tips
-
-- Start with `maxNodeDepth: 4` and adjust based on your needs
-- Use subscenes for complex components
-- Flatten unnecessary container nodes
-- Consider scene composition over deep hierarchies
-- Apply the rule to catch complexity early
-
 ## Related Documentation
 
 - [Configuration Reference](../configuration.md)
