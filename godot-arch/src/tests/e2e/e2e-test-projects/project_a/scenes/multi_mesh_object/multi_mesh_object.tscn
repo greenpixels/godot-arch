@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cy7f7gu3061ou"]
+
+[ext_resource type="Script" uid="uid://4rh57janyynb" path="res://scenes/multi_mesh_object/multi_mesh_object.gd" id="1_6ruih"]
+[node name="MultiMeshObject" type="Node"]
+script = ExtResource("1_6ruih")
+type = 1

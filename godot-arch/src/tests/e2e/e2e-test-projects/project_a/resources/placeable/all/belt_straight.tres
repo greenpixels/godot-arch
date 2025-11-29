@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Placeable" load_steps=5 format=3 uid="uid://bxjhju1efr42k"]
+
+[ext_resource type="PackedScene" uid="uid://cl4yk5p3x02ir" path="res://scenes/belt/belt_straight/belt_straight.tscn" id="1_l36le"]
+[ext_resource type="Script" uid="uid://cvk265sicnwj5" path="res://resources/placeable/placeable.gd" id="1_plvdq"]
+[ext_resource type="Texture2D" uid="uid://bki3v38awbxxr" path="res://assets/images/spritesheet_belt.png" id="3_gl2aq"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_11nac"]
+atlas = ExtResource("3_gl2aq")
+region = Rect2(0, 0, 32, 32)
+
+[resource]
+script = ExtResource("1_plvdq")
+scene = ExtResource("1_l36le")
+texture = SubResource("AtlasTexture_11nac")
+can_be_flipped = true
+can_be_rotated = true
+metadata/_custom_type_script = "uid://cvk265sicnwj5"

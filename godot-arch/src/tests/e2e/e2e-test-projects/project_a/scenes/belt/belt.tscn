@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://cr4rulxkhvdyn"]
+
+[ext_resource type="Script" uid="uid://chr36jv5udlsx" path="res://scenes/belt/belt.gd" id="1_vis0g"]
+[ext_resource type="PackedScene" uid="uid://ce036w60ytxr3" path="res://scenes/world_grid_object/world_grid_object.tscn" id="2_0u7u5"]
+
+[sub_resource type="Curve2D" id="Curve2D_o3865"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, -8, 0, 0, 0, 0, 0, 8)
+}
+point_count = 2
+
+[node name="Belt" type="Node2D"]
+script = ExtResource("1_vis0g")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+
+[node name="Path2D" type="Path2D" parent="."]
+curve = SubResource("Curve2D_o3865")
+
+[node name="PathFollow2D" type="PathFollow2D" parent="Path2D"]
+position = Vector2(0, -8)
+rotation = 1.5708
+cubic_interp = false
+loop = false
+
+[node name="WorldGridObject" parent="." node_paths=PackedStringArray("main_object") instance=ExtResource("2_0u7u5")]
+main_object = NodePath("..")

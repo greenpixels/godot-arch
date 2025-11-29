@@ -1,0 +1,66 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Automation"
+run/main_scene="uid://ufivglxxko7j"
+config/features=PackedStringArray("4.4", "GL Compatibility")
+config/icon="res://assets/images/icon.svg"
+
+[autoload]
+
+ProductionManager="*res://globals/production_manager/production_manager.tscn"
+WorldGrid="*res://globals/world_grid/world_grid.tscn"
+MultiMeshRenderer="*res://globals/multi_mesh_renderer/multi_mesh_renderer.tscn"
+
+[debug]
+
+gdscript/warnings/untyped_declaration=1
+gdscript/warnings/inferred_declaration=1
+gdscript/warnings/unsafe_cast=1
+gdscript/warnings/unsafe_call_argument=1
+gdscript/warnings/return_value_discarded=1
+
+[display]
+
+window/stretch/mode="canvas_items"
+
+[file_customization]
+
+folder_colors={
+"res://globals/": "green",
+"res://resources/": "yellow",
+"res://scenes/": "red",
+"res://scenes/ui/": "orange"
+}
+
+[input]
+
+rotate_placeable={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":82,"key_label":0,"unicode":114,"location":0,"echo":false,"script":null)
+]
+}
+flip_placeable={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":81,"key_label":0,"unicode":113,"location":0,"echo":false,"script":null)
+]
+}
+
+[physics]
+
+common/physics_interpolation=true
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

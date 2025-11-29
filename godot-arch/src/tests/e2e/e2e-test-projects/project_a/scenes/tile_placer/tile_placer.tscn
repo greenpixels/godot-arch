@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://b7xfm7w4etxhf"]
+
+[ext_resource type="Script" uid="uid://cjd06n3rnx3wa" path="res://scenes/tile_placer/tile_placer.gd" id="1_gf57p"]
+
+[node name="TilePlacer" type="Node2D"]
+script = ExtResource("1_gf57p")
+
+[node name="PlaceablePreview" type="Sprite2D" parent="."]
+physics_interpolation_mode = 2
+modulate = Color(1, 1, 1, 0.333333)

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Placeable" load_steps=5 format=3 uid="uid://dic6mpbd7mrx5"]
+
+[ext_resource type="PackedScene" uid="uid://kd46kkrwbs34" path="res://scenes/furnace/furnace.tscn" id="1_bc832"]
+[ext_resource type="Script" uid="uid://cvk265sicnwj5" path="res://resources/placeable/placeable.gd" id="1_ipu4x"]
+[ext_resource type="Texture2D" uid="uid://b1ptucnbiagqg" path="res://assets/images/spritesheet_tiles.png" id="3_yept5"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4a1ua"]
+atlas = ExtResource("3_yept5")
+
+[resource]
+script = ExtResource("1_ipu4x")
+scene = ExtResource("1_bc832")
+texture = SubResource("AtlasTexture_4a1ua")
+can_be_flipped = false
+can_be_rotated = false
+metadata/_custom_type_script = "uid://cvk265sicnwj5"

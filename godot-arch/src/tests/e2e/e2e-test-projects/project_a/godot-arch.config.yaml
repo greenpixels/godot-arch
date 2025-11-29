@@ -1,0 +1,55 @@
+includePatterns:
+    "rule-allowed-file-location":
+        - ./**
+    "rule-filename-snake-case":
+        - ./**
+    "rule-parent-has-same-name":
+        - ./**/*.{tscn,gd}
+    "rule-scene-nodes-pascal-case":
+        - ./**
+    "rule-root-node-is-file-name-pascal":
+        -  ./**
+    "rule-root-node-script-in-same-folder":
+        -  ./**
+    "rule-node-depth-fits-max-depth":
+        -  ./**
+    "rule-allowed-custom-resource-location":
+        - ./**
+    
+ignorePatterns:
+    overall:
+        - ./godot-arch*
+        - ./addons/**
+        - ./export/**
+        - ./.export_templates/**
+        - ./**/*.uid
+        - ./**/*.tmp
+        # Ignore hidden files
+        - ./**/.{*}
+
+allowedFileLocations:
+    "./**/*.tscn":
+        - ./globals/**
+        - ./scenes/**
+    "./**/*.gd":
+        - ./globals/**
+        - ./scenes/**
+        - ./resources/**
+    "./**/*.tres":
+        - ./resources/**/all/*.tres
+    "./**/*.gdshader":
+        - ./shaders/**
+    "./**/*.{png,jpg,jpeg,gif,webp,ico}":
+        - ./assets/images/**
+    "./**/*.{mp3,wave,ogg,flac,aac,m4a}":
+        - ./assets/audio/** 
+    "./**/*.{ttf}":
+        - ./assets/fonts/**
+    "./**/*.translation":
+        - ./localization/**
+
+allowedCustomResourceLocations:
+    Placeable:
+        - ./**/placeable/**
+
+shouldFailUnmatchedCustomResources: true

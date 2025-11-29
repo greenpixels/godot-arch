@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://ce036w60ytxr3"]
+
+[ext_resource type="Script" uid="uid://x7ax2d513fl1" path="res://scenes/world_grid_object/world_grid_object.gd" id="1_b3pgc"]
+
+[node name="WorldGridObject" type="Node"]
+script = ExtResource("1_b3pgc")
