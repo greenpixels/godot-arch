@@ -1,0 +1,19 @@
+[gd_scene load_steps=6 format=3 uid="uid://dj54x37jtretw"]
+
+[ext_resource type="Script" uid="uid://drkk4n34c4k1q" path="res://scenes/ui/placeable_selection/placeable_selection.gd" id="1_rkvib"]
+[ext_resource type="Script" uid="uid://cvk265sicnwj5" path="res://resources/placeable/placeable.gd" id="2_gkv5l"]
+[ext_resource type="Resource" uid="uid://bxjhju1efr42k" path="res://resources/placeable/all/belt_straight.tres" id="3_8iiv3"]
+[ext_resource type="Resource" uid="uid://dic6mpbd7mrx5" path="res://resources/placeable/all/furnace.tres" id="4_8iiv3"]
+[ext_resource type="Resource" uid="uid://6ltnxfio8v3r" path="res://resources/placeable/all/belt_corner.tres" id="4_nw5jp"]
+
+[node name="PlaceableSelection" type="PanelContainer"]
+offset_right = 224.0
+offset_bottom = 648.0
+script = ExtResource("1_rkvib")
+placeables = Array[ExtResource("2_gkv5l")]([ExtResource("3_8iiv3"), ExtResource("4_nw5jp"), ExtResource("4_8iiv3")])
+
+[node name="ItemList" type="ItemList" parent="."]
+layout_mode = 2
+allow_search = false
+
+[connection signal="item_clicked" from="ItemList" to="." method="_on_item_list_item_clicked"]

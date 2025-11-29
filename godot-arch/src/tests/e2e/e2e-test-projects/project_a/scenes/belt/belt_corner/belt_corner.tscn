@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=3 uid="uid://n375hh2cevu0"]
+
+[ext_resource type="PackedScene" uid="uid://cr4rulxkhvdyn" path="res://scenes/belt/belt.tscn" id="1_sm1p4"]
+[ext_resource type="Texture2D" uid="uid://bki3v38awbxxr" path="res://assets/images/spritesheet_belt.png" id="2_3d2oy"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mafmn"]
+atlas = ExtResource("2_3d2oy")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_hvt58"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mafmn")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="Curve2D" id="Curve2D_yex7t"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0)
+}
+point_count = 3
+
+[node name="BeltCorner" instance=ExtResource("1_sm1p4")]
+original_item_end_direction = Vector2i(1, 0)
+
+[node name="AnimatedSprite2D" parent="." index="0"]
+sprite_frames = SubResource("SpriteFrames_hvt58")
+
+[node name="Path2D" parent="." index="1"]
+curve = SubResource("Curve2D_yex7t")
+
+[node name="PathFollow2D" parent="Path2D" index="0"]
+position = Vector2(0, 15)
+rotation = -1.5708

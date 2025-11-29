@@ -154,12 +154,6 @@ my_awesome_scene.tscn → MyAwesomeScene
 player_controller.tscn → PlayerController
 ```
 
-## Tips
-
-- Use with [Filename Snake Case](./rule-filename-snake-case.md) for consistency
-- Apply to all `.tscn` files for best results
-- Great for onboarding new team members
-
 ## Related Documentation
 
 - [Configuration Reference](../configuration.md)

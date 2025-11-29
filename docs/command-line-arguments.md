@@ -168,8 +168,9 @@ Example GitHub Actions workflow:
 
 ## Exit Codes
 
-- **0**: All tests passed successfully
-- **Non-zero**: One or more tests failed (the tool returns an error)
+- **0**: All checks passed successfully
+- **1**: Tests executed with failed checks
+- **2**: There was a runtime issue/error while executing
 
 The exit code can be used in CI/CD pipelines to fail builds when linting issues are detected.
 

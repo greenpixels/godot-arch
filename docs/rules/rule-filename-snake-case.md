@@ -105,13 +105,6 @@ ignorePatterns:
 - **Cross-platform:** No case-sensitivity issues
 - **Convention:** Matches common Python/GDScript style
 
-## Tips
-
-- Apply this rule project-wide for maximum consistency
-- Set it up early in your project to avoid mass renaming later
-- Use with [Parent Has Same Name](./rule-parent-has-same-name.md) for a cohesive structure
-- Remember: file extensions (`.gd`, `.tscn`) don't need to match the rule
-
 ## Related Documentation
 
 - [Configuration Reference](../configuration.md)

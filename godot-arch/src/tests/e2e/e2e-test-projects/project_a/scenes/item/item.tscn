@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://cwhymoawplu3f"]
+
+[ext_resource type="Script" uid="uid://bin4ar6ma3yes" path="res://scenes/item/item.gd" id="1_vijbe"]
+[ext_resource type="PackedScene" uid="uid://cy7f7gu3061ou" path="res://scenes/multi_mesh_object/multi_mesh_object.tscn" id="2_vijbe"]
+
+[node name="Item" type="Node2D"]
+physics_interpolation_mode = 1
+script = ExtResource("1_vijbe")
+
+[node name="MultiMeshObject" parent="." node_paths=PackedStringArray("node_reference") instance=ExtResource("2_vijbe")]
+unique_name_in_owner = true
+type = 0
+node_reference = NodePath("..")
