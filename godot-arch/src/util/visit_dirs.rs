@@ -6,11 +6,7 @@ use crate::{
 };
 use glob_match::glob_match;
 
-pub fn visit_dirs(config: &Config, dir: &Path) -> Option<Vec<FileUnderCheck>> {
-    visit_dirs_internal(config, dir, dir)
-}
-
-fn visit_dirs_internal(
+pub fn collect_files_to_check(
     config: &Config,
     project_root: &Path,
     dir: &Path,
@@ -45,7 +41,7 @@ fn visit_dirs_internal(
         }
 
         if path.is_dir() {
-            if let Some(dir_files) = visit_dirs_internal(config, project_root, &path) {
+            if let Some(dir_files) = collect_files_to_check(config, project_root, &path) {
                 files.extend(dir_files);
             }
         } else {

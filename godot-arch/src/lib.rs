@@ -17,7 +17,7 @@ use crate::{
         check_results::CheckResults, print_summary::print_summary, print_warnings::print_warnings,
         report_writer::write_report,
     },
-    util::visit_dirs::visit_dirs,
+    util::visit_dirs::collect_files_to_check,
     validation::process_file::process_file,
 };
 
@@ -39,7 +39,7 @@ pub fn run_godot_arch(
     }
 
     println!("Indexing in {}", project_path);
-    if let Some(files) = visit_dirs(&config, path) {
+    if let Some(files) = collect_files_to_check(&config, path, path) {
         let mut handles = vec![];
         for file in files {
             let value_clone = config.clone();
