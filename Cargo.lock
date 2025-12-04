@@ -160,7 +160,7 @@ checksum = "9985c9503b412198aa4197559e9a318524ebc4519c229bfa05a535828c950b9d"
 
 [[package]]
 name = "godot-arch"
-version = "0.1.0"
+version = "0.8.0"
 dependencies = [
  "colored",
  "convert_case",
@@ -177,7 +177,7 @@ dependencies = [
 
 [[package]]
 name = "godot-arch-cli"
-version = "0.1.0"
+version = "0.8.0"
 dependencies = [
  "clap",
  "godot-arch",

@@ -2,5 +2,6 @@
 members = ["godot-arch","godot-arch-cli"]
 resolver = "3"
 
-[workspace.dependencies]
-colored = "3.0.0"
+[workspace.package]
+version = "0.8.0"
+edition = "2024"
