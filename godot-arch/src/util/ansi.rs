@@ -1,4 +1,4 @@
-pub fn enable_ansi_support() {
+pub fn enable_ansi_support_on_windows() {
     #[cfg(windows)]
     {
         use std::ptr::null_mut;

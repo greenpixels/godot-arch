@@ -1,9 +1,10 @@
 use godot_properties_parser::parsers::parser_property_file::PropertyFile;
 
-use crate::configuration::config::Config;
-use crate::reporting::test_results::TestResults;
-use crate::rules::rule_allowed_custom_resource_location::execute_rule_allowed_custom_resource_location;
-use crate::validation::file_under_test::FileUnderTest;
+use crate::{
+    configuration::config::Config, reporting::test_results::TestResults,
+    rules::rule_allowed_custom_resource_location::execute_rule_allowed_custom_resource_location,
+    validation::file_under_test::FileUnderTest,
+};
 
 pub fn validate_resource_file(
     parsed_resource_file: PropertyFile,

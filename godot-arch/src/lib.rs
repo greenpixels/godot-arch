@@ -1,7 +1,7 @@
 use colored::Colorize;
 use std::fs::exists;
+use std::io;
 use std::path::Path;
-use std::{io, vec};
 
 pub mod configuration;
 mod reporting;
@@ -10,8 +10,7 @@ mod rules;
 mod tests;
 mod util;
 mod validation;
-
-use crate::util::ansi::enable_ansi_support;
+use crate::util::ansi::enable_ansi_support_on_windows;
 use crate::{
     configuration::config::load_config,
     reporting::{
@@ -27,17 +26,11 @@ pub fn run_godot_arch(
     project_path: &str,
     report_location: Option<String>,
 ) -> Result<TestResults, Box<dyn std::error::Error>> {
-    enable_ansi_support();
+    enable_ansi_support_on_windows();
     let config = load_config(config_path)?;
     let start_time = std::time::Instant::now();
 
-    let mut test_results = TestResults {
-        files_tested: 0,
-        files_failed: 0,
-        warnings: vec![],
-        failed_reports: vec![],
-        successful_reports: vec![],
-    };
+    let mut test_results = TestResults::default();
 
     let path = Path::new(project_path);
 

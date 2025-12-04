@@ -6,7 +6,6 @@ use crate::configuration::{ignore_patterns::IgnorePatterns, include_patterns::In
 
 #[derive(Debug, Deserialize)]
 #[serde(default)]
-
 pub struct Config {
     #[serde(rename = "ignorePatterns")]
     pub ignore_patterns: IgnorePatterns,

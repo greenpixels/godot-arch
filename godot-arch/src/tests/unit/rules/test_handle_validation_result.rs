@@ -18,8 +18,8 @@ fn test_should_correctly_handle_failed_validation() {
         &get_file_under_test_mock("folder", "file_is_snake_case", "tscn"),
     );
     let predicate = prelude::predicate::str::contains("Failed").count(1);
-    assert_eq!(true, validation_result.is_some());
-    assert_eq!(true, predicate.eval(&validation_result.unwrap()));
+    assert!(validation_result.is_some());
+    assert!(predicate.eval(&validation_result.unwrap()));
     assert_eq!(test_results.files_failed, 1);
     assert_eq!(test_results.files_tested, 1);
 }
@@ -37,8 +37,8 @@ fn test_should_correctly_handle_successful_validation() {
         &get_file_under_test_mock("folder", "file_is_snake_case", "tscn"),
     );
     let predicate = prelude::predicate::str::contains("Succesful").count(1);
-    assert_eq!(true, validation_result.is_some());
-    assert_eq!(true, predicate.eval(&validation_result.unwrap()));
+    assert!(validation_result.is_some());
+    assert!(predicate.eval(&validation_result.unwrap()));
     assert_eq!(test_results.files_tested, 1);
     assert_eq!(test_results.files_failed, 0);
 }
@@ -55,7 +55,7 @@ fn test_should_not_output_on_success_when_flag_is_false() {
         &mut test_results,
         &get_file_under_test_mock("folder", "file_is_snake_case", "tscn"),
     );
-    assert_eq!(true, !validation_result.is_some());
+    assert!(validation_result.is_none());
 }
 
 #[test]
@@ -71,6 +71,6 @@ fn test_should_output_on_failed_when_flag_is_false() {
         &get_file_under_test_mock("folder", "file_is_snake_case", "tscn"),
     );
     let predicate = prelude::predicate::str::contains("Failed").count(1);
-    assert_eq!(true, validation_result.is_some());
-    assert_eq!(true, predicate.eval(&validation_result.unwrap()));
+    assert!(validation_result.is_some());
+    assert!(predicate.eval(&validation_result.unwrap()));
 }
