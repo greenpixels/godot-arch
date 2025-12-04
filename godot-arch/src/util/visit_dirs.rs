@@ -17,33 +17,35 @@ pub fn visit_dirs(
     test_results: &mut TestResults,
     callback: &dyn Fn(&str, &DirEntry, &mut TestResults, &Config),
 ) -> io::Result<()> {
-    if dir.is_dir() {
-        for entry in read_dir(dir)? {
-            let entry = entry?;
-            let path = entry.path();
+    if !dir.is_dir() {
+        return Ok(());
+    }
+    for entry in read_dir(dir)? {
+        let entry = entry?;
+        let path = entry.path();
 
-            let normalized_path = normalize_path(
-                dir.strip_prefix(path.display().to_string())
-                    .unwrap_or(dir)
-                    .to_str()
-                    .unwrap_or(""),
-            );
+        let normalized_path = normalize_path(
+            dir.strip_prefix(path.display().to_string())
+                .unwrap_or(dir)
+                .to_str()
+                .unwrap_or(""),
+        );
 
-            if config
-                .ignore_patterns
-                .overall
-                .iter()
-                .any(|pattern| glob_match(pattern, &normalized_path))
-            {
-                continue;
-            }
+        if config
+            .ignore_patterns
+            .overall
+            .iter()
+            .any(|pattern| glob_match(pattern, &normalized_path))
+        {
+            continue;
+        }
 
-            if path.is_dir() {
-                visit_dirs(path_string, config, &path, test_results, callback)?;
-            } else {
-                callback(path_string, &entry, test_results, config);
-            }
+        if path.is_dir() {
+            visit_dirs(path_string, config, &path, test_results, callback)?;
+        } else {
+            callback(path_string, &entry, test_results, config);
         }
     }
+
     Ok(())
 }

@@ -1,94 +1,50 @@
 use std::collections::HashMap;
 
-use serde::*;
+use serde::Deserialize;
+
+use crate::configuration::{ignore_patterns::IgnorePatterns, include_patterns::IncludePatterns};
 
 #[derive(Debug, Deserialize)]
+#[serde(default)]
+
 pub struct Config {
-    #[serde(default)]
     #[serde(rename = "ignorePatterns")]
     pub ignore_patterns: IgnorePatterns,
-    #[serde(default)]
     #[serde(rename = "includePatterns")]
     pub include_patterns: IncludePatterns,
-    #[serde(default)]
     #[serde(rename = "allowedFileLocations")]
     pub allowed_file_locations: HashMap<String, Vec<String>>,
-    #[serde(default)]
     #[serde(rename = "allowedCustomResourceLocations")]
     pub allowed_custom_resource_locations: HashMap<String, Vec<String>>,
-    #[serde(default)]
     #[serde(rename = "nodeNamePascalCaseExceptions")]
     pub node_name_pascal_case_exceptions: Vec<HashMap<String, String>>,
-    #[serde(default)]
     #[serde(rename = "allowScreamingSnakeCaseInNodeNames")]
     pub allow_screaming_snake_case_in_node_names: bool,
-    #[serde(default)]
     #[serde(rename = "shouldPrintSuccess")]
     pub should_print_success: bool,
     #[serde(rename = "waitForInputBeforeClose")]
-    #[serde(default)]
     pub wait_for_input_before_close: bool,
     #[serde(rename = "maxNodeDepth")]
-    #[serde(default = "default_max_node_depth")]
     pub max_node_depth: usize,
     #[serde(rename = "failUnmatchedCustomResources")]
-    #[serde(default)]
     pub should_fail_unmatched_custom_resources: bool,
 }
 
-fn default_max_node_depth() -> usize {
-    4
-}
-
-#[derive(Debug, Deserialize, Default)]
-pub struct IgnorePatterns {
-    #[serde(default)]
-    pub overall: Vec<String>,
-    #[serde(rename = "rule-allowed-file-location")]
-    #[serde(default)]
-    pub allowed_file_location: Vec<String>,
-    #[serde(rename = "rule-allowed-custom-resource-location")]
-    #[serde(default)]
-    pub allowed_custom_resource_location: Vec<String>,
-    #[serde(rename = "rule-filename-snake-case")]
-    #[serde(default)]
-    pub filename_snake_case: Vec<String>,
-    #[serde(rename = "rule-parent-has-same-name")]
-    #[serde(default)]
-    pub parent_has_same_name: Vec<String>,
-    #[serde(rename = "rule-scene-nodes-pascal-case")]
-    #[serde(default)]
-    pub scene_nodes_pascal_case: Vec<String>,
-    #[serde(rename = "rule-root-node-is-file-name-pascal")]
-    #[serde(default)]
-    pub root_node_is_file_name_pascal: Vec<String>,
-    #[serde(rename = "rule-root-node-script-in-same-folder")]
-    #[serde(default)]
-    pub root_node_script_in_same_folder: Vec<String>,
-    #[serde(rename = "rule-node-depth-fits-max-depth")]
-    #[serde(default)]
-    pub node_depth_fits_max_depth: Vec<String>,
-}
-#[derive(Debug, Deserialize, Default)]
-pub struct IncludePatterns {
-    #[serde(rename = "rule-filename-snake-case")]
-    #[serde(default)]
-    pub filename_snake_case: Vec<String>,
-    #[serde(rename = "rule-parent-has-same-name")]
-    #[serde(default)]
-    pub parent_has_same_name: Vec<String>,
-    #[serde(rename = "rule-scene-nodes-pascal-case")]
-    #[serde(default)]
-    pub scene_nodes_pascal_case: Vec<String>,
-    #[serde(rename = "rule-root-node-is-file-name-pascal")]
-    #[serde(default)]
-    pub root_node_is_file_name_pascal: Vec<String>,
-    #[serde(rename = "rule-root-node-script-in-same-folder")]
-    #[serde(default)]
-    pub root_node_script_in_same_folder: Vec<String>,
-    #[serde(rename = "rule-node-depth-fits-max-depth")]
-    #[serde(default)]
-    pub node_depth_fits_max_depth: Vec<String>,
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            ignore_patterns: IgnorePatterns::default(),
+            include_patterns: IncludePatterns::default(),
+            allowed_file_locations: HashMap::new(),
+            allowed_custom_resource_locations: HashMap::new(),
+            node_name_pascal_case_exceptions: vec![],
+            allow_screaming_snake_case_in_node_names: false,
+            should_print_success: false,
+            wait_for_input_before_close: false,
+            max_node_depth: 4,
+            should_fail_unmatched_custom_resources: false,
+        }
+    }
 }
 
 pub fn load_config(path: &str) -> Result<Config, Box<dyn std::error::Error>> {

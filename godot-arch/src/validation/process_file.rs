@@ -2,15 +2,20 @@ use colored::Colorize;
 use godot_properties_parser::{parse_property_file, parse_scene_file};
 use std::fs::DirEntry;
 
-use crate::configuration::config::Config;
-use crate::reporting::test_results::TestResults;
-use crate::reporting::warning::Warning;
-use crate::rules::rule_allowed_file_location::execute_rule_allowed_file_location;
-use crate::rules::rule_filename_snake_case::execute_rule_filename_snake_case;
-use crate::rules::rule_parent_has_same_name::execute_rule_parent_has_same_name;
-use crate::util::normalize_path::normalize_path;
-use crate::validation::file_under_test::FileUnderTest;
-use crate::validation::scene_validator::validate_scene_file;
+use crate::{
+    configuration::config::Config,
+    reporting::{test_results::TestResults, warning::Warning},
+    rules::{
+        rule_allowed_file_location::execute_rule_allowed_file_location,
+        rule_filename_snake_case::execute_rule_filename_snake_case,
+        rule_parent_has_same_name::execute_rule_parent_has_same_name,
+    },
+    util::normalize_path::normalize_path,
+    validation::{
+        file_under_test::FileUnderTest, resource_validator::validate_resource_file,
+        scene_validator::validate_scene_file,
+    },
+};
 
 pub fn process_file(
     input_path_string: &str,
@@ -84,12 +89,9 @@ pub fn process_file(
                     });
                     return;
                 }
-                Ok((_, resource_file)) => super::resource_validator::validate_resource_file(
-                    resource_file,
-                    &file_under_test,
-                    test_results,
-                    config,
-                ),
+                Ok((_, resource_file)) => {
+                    validate_resource_file(resource_file, &file_under_test, test_results, config)
+                }
             },
             _ => (),
         }

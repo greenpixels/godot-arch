@@ -11,14 +11,16 @@ mod tests;
 mod util;
 mod validation;
 
-use crate::configuration::config::load_config;
-use crate::reporting::print_summary::print_summary;
-use crate::reporting::print_warnings::print_warnings;
-use crate::reporting::report_writer::write_report;
-use crate::reporting::test_results::TestResults;
 use crate::util::ansi::enable_ansi_support;
-use crate::util::visit_dirs::visit_dirs;
-use crate::validation::process_file::process_file;
+use crate::{
+    configuration::config::load_config,
+    reporting::{
+        print_summary::print_summary, print_warnings::print_warnings, report_writer::write_report,
+        test_results::TestResults,
+    },
+    util::visit_dirs::visit_dirs,
+    validation::process_file::process_file,
+};
 
 pub fn run_godot_arch(
     config_path: &str,

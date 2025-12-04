@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use crate::reporting::{report_entry::ReportEntry, warning::Warning};
 
-#[derive(Serialize)]
+#[derive(Serialize, Default)]
 pub struct TestResults {
     pub files_tested: i32,
     pub files_failed: i32,
