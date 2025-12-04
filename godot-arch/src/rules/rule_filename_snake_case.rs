@@ -24,7 +24,7 @@ pub fn execute_rule_filename_snake_case(
 
     let is_valid = file.file_name.is_case(Case::Snake);
 
-    let validation_output = handle_validation_result(
+    handle_validation_result(
         is_valid,
         "rule-filename-snake-case".to_owned(),
         format!(
@@ -37,11 +37,7 @@ pub fn execute_rule_filename_snake_case(
             file.file_name.to_case(Case::Snake).bold(),
             file.file_name.bold()
         ),
-        config.should_print_success,
         test_results,
         file,
     );
-    if validation_output.is_some() {
-        println!("{}", validation_output.unwrap())
-    }
 }

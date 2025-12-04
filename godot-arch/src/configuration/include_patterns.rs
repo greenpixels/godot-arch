@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize, Default)]
+#[derive(Debug, Deserialize, Default, Clone)]
 pub struct IncludePatterns {
     #[serde(rename = "rule-filename-snake-case")]
     #[serde(default)]

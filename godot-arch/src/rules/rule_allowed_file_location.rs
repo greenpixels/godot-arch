@@ -44,7 +44,7 @@ pub fn execute_rule_allowed_file_location(
 
     let folders_list = matched_allowed_locations.join(" or ");
 
-    let validation_output = handle_validation_result(
+    handle_validation_result(
         is_in_correct_location,
         "rule-allowed-file-location".to_owned(),
         format!("Found {} in correct location", file.file_name.bold()),
@@ -54,12 +54,7 @@ pub fn execute_rule_allowed_file_location(
             folders_list.bold(),
             file.relative_path.bold(),
         ),
-        config.should_print_success,
         test_results,
         file,
     );
-
-    if let Some(output) = validation_output {
-        println!("{}", output);
-    }
 }

@@ -31,7 +31,7 @@ pub fn execute_rule_node_depth_fits_max_depth(
 
     let is_valid = actual_depth <= config.max_node_depth;
 
-    let validation_output = handle_validation_result(
+    handle_validation_result(
         is_valid,
         "rule-node-depth-fits-max-depth".to_owned(),
         format!(
@@ -47,11 +47,7 @@ pub fn execute_rule_node_depth_fits_max_depth(
             file.relative_path.bold(),
             config.max_node_depth.to_string().green(),
         ),
-        config.should_print_success,
         test_results,
         file,
     );
-    if validation_output.is_some() {
-        println!("{}", validation_output.unwrap())
-    }
 }

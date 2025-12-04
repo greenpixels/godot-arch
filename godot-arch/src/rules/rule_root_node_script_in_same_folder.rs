@@ -89,7 +89,7 @@ pub fn execute_rule_root_node_script_in_same_folder(
         is_valid = false
     }
 
-    let validation_output = handle_validation_result(
+    handle_validation_result(
         is_valid,
         "rule-root-node-script-in-same-folder".to_owned(),
         format!(
@@ -100,11 +100,7 @@ pub fn execute_rule_root_node_script_in_same_folder(
             "Expected script of root node to be next to the scene-file for '{}'",
             file.absolute_path.bold()
         ),
-        config.should_print_success,
         test_results,
         file,
     );
-    if validation_output.is_some() {
-        println!("{}", validation_output.unwrap())
-    }
 }

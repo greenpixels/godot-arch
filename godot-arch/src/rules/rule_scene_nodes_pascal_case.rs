@@ -34,7 +34,7 @@ pub fn execute_rule_scene_needs_pascal_case(
         is_valid = node_name_to_test.is_case(Case::UpperSnake);
     }
 
-    let validation_output = handle_validation_result(
+    handle_validation_result(
         is_valid,
         "rule-scene-nodes-pascal-case".to_owned(),
         format!(
@@ -52,11 +52,7 @@ pub fn execute_rule_scene_needs_pascal_case(
             file.file_name.bold(),
             node_name.bold(),
         ),
-        config.should_print_success,
         test_results,
         file,
     );
-    if validation_output.is_some() {
-        println!("{}", validation_output.unwrap())
-    }
 }

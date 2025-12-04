@@ -31,7 +31,7 @@ pub fn execute_rule_parent_has_same_name(
         })
         .unwrap_or(false);
 
-    let validation_output = handle_validation_result(
+    handle_validation_result(
         has_parent_with_same_name,
         "rule-parent-has-same-name".to_owned(),
         format!(
@@ -43,11 +43,7 @@ pub fn execute_rule_parent_has_same_name(
             file.file_name.bold(),
             file.relative_path.bold()
         ),
-        config.should_print_success,
         test_results,
         file,
     );
-    if validation_output.is_some() {
-        println!("{}", validation_output.unwrap())
-    }
 }

@@ -4,7 +4,7 @@ use serde::Deserialize;
 
 use crate::configuration::{ignore_patterns::IgnorePatterns, include_patterns::IncludePatterns};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 #[serde(default)]
 pub struct Config {
     #[serde(rename = "ignorePatterns")]

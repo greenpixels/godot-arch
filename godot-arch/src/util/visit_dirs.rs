@@ -1,27 +1,31 @@
-use std::{
-    fs::{DirEntry, read_dir},
-    io,
-    path::Path,
-};
+use std::{fs::read_dir, path::Path};
 
 use crate::{
-    configuration::config::Config, reporting::test_results::TestResults,
-    util::normalize_path::normalize_path,
+    configuration::config::Config, util::normalize_path::normalize_path,
+    validation::file_under_test::FileUnderTest,
 };
 use glob_match::glob_match;
 
-pub fn visit_dirs(
-    path_string: &str,
+pub fn visit_dirs(config: &Config, dir: &Path) -> Option<Vec<FileUnderTest>> {
+    visit_dirs_internal(config, dir, dir)
+}
+
+fn visit_dirs_internal(
     config: &Config,
+    project_root: &Path,
     dir: &Path,
-    test_results: &mut TestResults,
-    callback: &dyn Fn(&str, &DirEntry, &mut TestResults, &Config),
-) -> io::Result<()> {
+) -> Option<Vec<FileUnderTest>> {
     if !dir.is_dir() {
-        return Ok(());
+        return None;
     }
-    for entry in read_dir(dir)? {
-        let entry = entry?;
+    let read_dir_iter = match read_dir(dir) {
+        Ok(iter) => iter,
+        Err(_) => return None,
+    };
+    let mut files: Vec<FileUnderTest> = vec![];
+    let project_path = project_root.to_str().unwrap_or("");
+    for entry in read_dir_iter {
+        let Some(entry) = entry.ok() else { continue };
         let path = entry.path();
 
         let normalized_path = normalize_path(
@@ -41,11 +45,13 @@ pub fn visit_dirs(
         }
 
         if path.is_dir() {
-            visit_dirs(path_string, config, &path, test_results, callback)?;
+            if let Some(dir_files) = visit_dirs_internal(config, project_root, &path) {
+                files.extend(dir_files);
+            }
         } else {
-            callback(path_string, &entry, test_results, config);
+            files.push(FileUnderTest::from_dir_entry(&entry, project_path));
         }
     }
 
-    Ok(())
+    Some(files)
 }

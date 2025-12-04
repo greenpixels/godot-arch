@@ -50,7 +50,7 @@ pub fn execute_rule_allowed_custom_resource_location(
 
     let folders_list = matched_allowed_locations.join(" or ");
 
-    let validation_output = handle_validation_result(
+    handle_validation_result(
         in_correct_root,
         "rule-allowed-custom-resource-location".to_owned(),
         format!(
@@ -71,11 +71,7 @@ pub fn execute_rule_allowed_custom_resource_location(
                 file.relative_path.bold(),
             )
         },
-        config.should_print_success,
         test_results,
         file,
     );
-    if validation_output.is_some() {
-        println!("{}", validation_output.unwrap())
-    }
 }

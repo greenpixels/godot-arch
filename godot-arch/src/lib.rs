@@ -1,7 +1,7 @@
 use colored::Colorize;
 use std::fs::exists;
-use std::io;
 use std::path::Path;
+use std::{io, thread};
 
 pub mod configuration;
 mod reporting;
@@ -39,13 +39,22 @@ pub fn run_godot_arch(
     }
 
     println!("Indexing in {}", project_path);
-    visit_dirs(
-        project_path,
-        &config,
-        path,
-        &mut test_results,
-        &process_file,
-    )?;
+    if let Some(files) = visit_dirs(&config, path) {
+        let mut handles = vec![];
+        for file in files {
+            let value_clone = config.clone();
+            handles.push(thread::spawn(move || process_file(file, value_clone)));
+        }
+        for handle in handles {
+            if let Ok(result) = handle.join() {
+                if result.is_none() {
+                    continue;
+                }
+                test_results.merge(result.unwrap_or(TestResults::default()));
+            }
+        }
+    }
+
     print_warnings(&test_results);
 
     let elapsed_time = start_time.elapsed();
