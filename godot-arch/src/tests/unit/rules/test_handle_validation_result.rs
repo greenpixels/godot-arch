@@ -1,6 +1,6 @@
 use crate::{
     rules::handle_validation_result,
-    tests::mocks::{get_file_under_check_mock, get_check_results_mock},
+    tests::mocks::{get_check_results_mock, get_file_under_check_mock},
 };
 
 #[test]

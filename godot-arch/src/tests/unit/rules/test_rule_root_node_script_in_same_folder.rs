@@ -1,9 +1,9 @@
 use crate::{
     rules::rule_root_node_script_in_same_folder::execute_rule_root_node_script_in_same_folder,
     tests::mocks::{
-        get_config_mock, get_file_under_check_mock, get_parsed_scene_file_data_mock,
-        get_scene_external_resource, get_scene_node_mock_with_external_script,
-        get_check_results_mock,
+        get_check_results_mock, get_config_mock, get_file_under_check_mock,
+        get_parsed_scene_file_data_mock, get_scene_external_resource,
+        get_scene_node_mock_with_external_script,
     },
 };
 

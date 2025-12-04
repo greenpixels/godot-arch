@@ -1,6 +1,6 @@
 use crate::{
     rules::rule_filename_snake_case::execute_rule_filename_snake_case,
-    tests::mocks::{get_config_mock, get_file_under_check_mock, get_check_results_mock},
+    tests::mocks::{get_check_results_mock, get_config_mock, get_file_under_check_mock},
 };
 
 fn assert_results(file_name: &str, expected_files_checked: i32, expected_checks_failed: i32) {

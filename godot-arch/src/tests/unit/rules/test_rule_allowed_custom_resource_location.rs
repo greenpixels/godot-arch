@@ -1,6 +1,6 @@
 use crate::{
     rules::rule_allowed_custom_resource_location::execute_rule_allowed_custom_resource_location,
-    tests::mocks::{get_config_mock, get_file_under_check_mock, get_check_results_mock},
+    tests::mocks::{get_check_results_mock, get_config_mock, get_file_under_check_mock},
 };
 
 fn assert_results(folder: &str, expected_files_checked: i32, expected_checks_failed: i32) {
