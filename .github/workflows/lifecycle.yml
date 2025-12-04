@@ -49,7 +49,7 @@ jobs:
         run: cargo build --release
 
       - name: Rename binary
-        run: Rename-Item -Path .\target\release\godot-arch-cli.exe -NewName godot-arch.exe
+        run: Rename-Item -Path .\target\release\godot-arch-cli.exe -NewName godot-arch.exe -Force
         shell: pwsh
 
       - name: Upload artifact
