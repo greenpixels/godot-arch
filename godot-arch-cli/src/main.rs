@@ -21,8 +21,8 @@ fn main() {
     } = Args::parse_args();
 
     match run_godot_arch(&config_path, &project_path, report_location) {
-        Ok(test_results) => {
-            if test_results.files_failed > 0 {
+        Ok(check_results) => {
+            if check_results.files_failed > 0 {
                 exit(ExitCode::Failure as i32)
             } else {
                 exit(ExitCode::Success as i32)

@@ -1,12 +1,12 @@
 use std::path::Path;
 
-use crate::reporting::test_results::TestResults;
+use crate::reporting::check_results::CheckResults;
 
-pub fn write_report(report_location: &str, test_results: &TestResults) -> Result<(), String> {
+pub fn write_report(report_location: &str, check_results: &CheckResults) -> Result<(), String> {
     let report_path = Path::new(report_location).join("godot-arch-report.json");
     println!("Writing report to {}", report_path.display());
 
-    let report_json = serde_json::to_string_pretty(test_results)
+    let report_json = serde_json::to_string_pretty(check_results)
         .map_err(|e| format!("Failed to serialize report: {}", e))?;
 
     if let Some(parent) = report_path.parent() {

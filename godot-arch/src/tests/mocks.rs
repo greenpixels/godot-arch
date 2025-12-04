@@ -2,28 +2,24 @@ use std::collections::HashMap;
 use std::{path::PathBuf, vec};
 
 use crate::configuration::config::Config;
-use crate::reporting::test_results::TestResults;
-use crate::validation::file_under_test::FileUnderTest;
+use crate::configuration::ignore_patterns::IgnorePatterns;
+use crate::configuration::include_patterns::IncludePatterns;
+use crate::reporting::check_results::CheckResults;
+use crate::validation::file_under_check::FileUnderCheck;
 use godot_properties_parser::parsers::{
     parser_property::UntypedProperty, parser_property_file::Section, parser_scene_file::SceneFile,
 };
 
-pub fn get_test_results_mock() -> TestResults {
-    return TestResults {
-        files_tested: 0,
-        files_failed: 0,
-        warnings: vec![],
-        failed_reports: vec![],
-        successful_reports: vec![],
-    };
+pub fn get_check_results_mock() -> CheckResults {
+    CheckResults::default()
 }
 
-pub fn get_file_under_test_mock(
+pub fn get_file_under_check_mock(
     path_in_godot: &str,
     file_base_name: &str,
     extension: &str,
-) -> FileUnderTest {
-    return FileUnderTest {
+) -> FileUnderCheck {
+    FileUnderCheck {
         path: PathBuf::from(format!(
             "./{}/{}.{}",
             path_in_godot, file_base_name, extension
@@ -35,17 +31,17 @@ pub fn get_file_under_test_mock(
         extension: extension.to_owned(),
         file_name: format!("{}.{}", file_base_name, extension),
         relative_path: format!("./{}/{}.{}", path_in_godot, file_base_name, extension),
-    };
+    }
 }
 
 pub fn get_config_mock() -> Config {
-    return Config {
+    Config {
         allow_screaming_snake_case_in_node_names: false,
         allowed_file_locations: HashMap::new(),
-        ignore_patterns: crate::configuration::config::IgnorePatterns {
+        ignore_patterns: IgnorePatterns {
             ..Default::default()
         },
-        include_patterns: crate::configuration::config::IncludePatterns {
+        include_patterns: IncludePatterns {
             filename_snake_case: vec!["./**".to_owned()],
             parent_has_same_name: vec!["./**".to_owned()],
             scene_nodes_pascal_case: vec!["./**".to_owned()],
@@ -59,19 +55,11 @@ pub fn get_config_mock() -> Config {
         max_node_depth: 4,
         allowed_custom_resource_locations: HashMap::new(),
         should_fail_unmatched_custom_resources: false,
-    };
+    }
 }
 
 pub fn get_parsed_scene_file_data_mock() -> SceneFile {
-    return SceneFile {
-        header: None,
-        ext_resources: vec![],
-        sub_resources: vec![],
-        nodes: vec![],
-        connections: vec![],
-        editables: vec![],
-        all_sections: vec![],
-    };
+    SceneFile::new()
 }
 
 pub fn get_scene_node_mock_with_external_script(name: &str, script_id: &str) -> Section {
@@ -90,10 +78,10 @@ pub fn get_scene_node_mock_with_external_script(name: &str, script_id: &str) -> 
         },
     ];
 
-    return Section {
+    Section {
         header_type: String::from("node"),
         properties,
-    };
+    }
 }
 
 pub fn get_scene_external_resource(res_path: &str, script_id: &str) -> Section {
@@ -116,8 +104,8 @@ pub fn get_scene_external_resource(res_path: &str, script_id: &str) -> Section {
         },
     ];
 
-    return Section {
+    Section {
         header_type: String::from("ext_resource"),
         properties,
-    };
+    }
 }

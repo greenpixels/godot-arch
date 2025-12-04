@@ -2,13 +2,15 @@ name: Lifecycle
 
 on:
   push:
+    branches: [ master ]
   pull_request:
+    branches: [ master ]
   workflow_call:
   workflow_dispatch:
 
 jobs:
   delete-artifacts:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: kolpav/purge-artifacts-action@v1
         with:
@@ -16,7 +18,7 @@ jobs:
           expire-in: 3days 
 
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
@@ -26,6 +28,9 @@ jobs:
       - name: Build for Linux
         run: cargo build --release
 
+      - name: Rename binary
+        run: mv ./target/release/godot-arch-cli ./target/release/godot-arch
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -33,7 +38,7 @@ jobs:
           path: target/release/godot-arch
 
   build-windows:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
 
@@ -43,6 +48,10 @@ jobs:
       - name: Build for Windows
         run: cargo build --release
 
+      - name: Rename binary
+        run: Rename-Item -Path .\target\release\godot-arch-cli.exe -NewName godot-arch.exe
+        shell: pwsh
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -50,7 +59,7 @@ jobs:
           path: target/release/godot-arch.exe
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 

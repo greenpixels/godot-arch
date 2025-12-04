@@ -1,15 +1,15 @@
 use crate::{
-    configuration::config::Config, reporting::test_results::TestResults,
+    configuration::config::Config, reporting::check_results::CheckResults,
     rules::handle_validation_result::handle_validation_result,
     util::should_ignore_rule_for_file::should_ignore_rule_for_file,
-    validation::file_under_test::FileUnderTest,
+    validation::file_under_check::FileUnderCheck,
 };
 use colored::Colorize;
 
 pub fn execute_rule_parent_has_same_name(
-    file: &FileUnderTest,
+    file: &FileUnderCheck,
     config: &Config,
-    test_results: &mut TestResults,
+    check_results: &mut CheckResults,
 ) {
     if should_ignore_rule_for_file(
         file,
@@ -31,7 +31,7 @@ pub fn execute_rule_parent_has_same_name(
         })
         .unwrap_or(false);
 
-    let validation_output = handle_validation_result(
+    handle_validation_result(
         has_parent_with_same_name,
         "rule-parent-has-same-name".to_owned(),
         format!(
@@ -43,11 +43,7 @@ pub fn execute_rule_parent_has_same_name(
             file.file_name.bold(),
             file.relative_path.bold()
         ),
-        config.should_print_success,
-        test_results,
+        check_results,
         file,
     );
-    if validation_output.is_some() {
-        println!("{}", validation_output.unwrap())
-    }
 }

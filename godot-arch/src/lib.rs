@@ -1,7 +1,7 @@
 use colored::Colorize;
 use std::fs::exists;
 use std::path::Path;
-use std::{io, vec};
+use std::{io, thread};
 
 pub mod configuration;
 mod reporting;
@@ -10,32 +10,27 @@ mod rules;
 mod tests;
 mod util;
 mod validation;
-
-use crate::configuration::config::load_config;
-use crate::reporting::print_summary::print_summary;
-use crate::reporting::print_warnings::print_warnings;
-use crate::reporting::report_writer::write_report;
-use crate::reporting::test_results::TestResults;
-use crate::util::ansi::enable_ansi_support;
-use crate::util::visit_dirs::visit_dirs;
-use crate::validation::process_file::process_file;
+use crate::util::ansi::enable_ansi_support_on_windows;
+use crate::{
+    configuration::config::load_config,
+    reporting::{
+        check_results::CheckResults, print_summary::print_summary, print_warnings::print_warnings,
+        report_writer::write_report,
+    },
+    util::visit_dirs::collect_files_to_check,
+    validation::process_file::process_file,
+};
 
 pub fn run_godot_arch(
     config_path: &str,
     project_path: &str,
     report_location: Option<String>,
-) -> Result<TestResults, Box<dyn std::error::Error>> {
-    enable_ansi_support();
+) -> Result<CheckResults, Box<dyn std::error::Error>> {
+    enable_ansi_support_on_windows();
     let config = load_config(config_path)?;
     let start_time = std::time::Instant::now();
 
-    let mut test_results = TestResults {
-        files_tested: 0,
-        files_failed: 0,
-        warnings: vec![],
-        failed_reports: vec![],
-        successful_reports: vec![],
-    };
+    let mut check_results = CheckResults::default();
 
     let path = Path::new(project_path);
 
@@ -44,20 +39,29 @@ pub fn run_godot_arch(
     }
 
     println!("Indexing in {}", project_path);
-    visit_dirs(
-        project_path,
-        &config,
-        path,
-        &mut test_results,
-        &process_file,
-    )?;
-    print_warnings(&test_results);
+    if let Some(files) = collect_files_to_check(&config, path, path) {
+        let mut handles = vec![];
+        for file in files {
+            let value_clone = config.clone();
+            handles.push(thread::spawn(move || process_file(file, value_clone)));
+        }
+        for handle in handles {
+            if let Ok(result) = handle.join() {
+                if result.is_none() {
+                    continue;
+                }
+                check_results.merge(result.unwrap_or(CheckResults::default()));
+            }
+        }
+    }
+
+    print_warnings(&check_results);
 
     let elapsed_time = start_time.elapsed();
-    print_summary(&test_results, elapsed_time);
+    print_summary(&check_results, elapsed_time);
 
     if let Some(location) = report_location
-        && let Err(e) = write_report(&location, &test_results)
+        && let Err(e) = write_report(&location, &check_results)
     {
         eprintln!("Error writing report: {}", e);
     }
@@ -66,5 +70,5 @@ pub fn run_godot_arch(
         println!("\nPress any button to exit ...");
         io::stdin().read_line(&mut String::new()).unwrap();
     }
-    Ok(test_results)
+    Ok(check_results)
 }

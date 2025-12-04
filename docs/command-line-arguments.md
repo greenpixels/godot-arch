@@ -69,15 +69,15 @@ godot-arch --report /tmp/godot-arch-results
 
 - The report will be saved as `godot-arch-report.json` in the specified directory
 - If the directory doesn't exist, it will be created automatically
-- The report includes detailed information about all test results, failures, and warnings
+- The report includes detailed information about all rule checks, failures, and warnings
 - Useful for CI/CD pipelines and automated analysis
 
 **Report Format:**
 
 ```json
 {
-  "files_tested": 42,
-  "files_failed": 3,
+  "files_checked": 42,
+  "checks_failed": 3,
   "warnings": [...],
   "failed_reports": [...],
   "successful_reports": [...]
@@ -168,8 +168,8 @@ Example GitHub Actions workflow:
 
 ## Exit Codes
 
-- **0**: All checks passed successfully
-- **1**: Tests executed with failed checks
+- **0**: Successfully executed with all checks passed
+- **1**: Successfully executed with failed checks
 - **2**: There was a runtime issue/error while executing
 
 The exit code can be used in CI/CD pipelines to fail builds when linting issues are detected.

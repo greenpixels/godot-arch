@@ -1,18 +1,18 @@
 use crate::{
     configuration::config::Config,
-    reporting::{test_results::TestResults, warning::Warning},
+    reporting::{check_results::CheckResults, warning::Warning},
     rules::handle_validation_result::handle_validation_result,
     util::should_ignore_rule_for_file::should_ignore_rule_for_file,
-    validation::file_under_test::FileUnderTest,
+    validation::file_under_check::FileUnderCheck,
 };
 use colored::Colorize;
 use godot_properties_parser::parsers::parser_scene_file::SceneFile;
 
 pub fn execute_rule_root_node_script_in_same_folder(
     _parsed_scene: &SceneFile,
-    file: &FileUnderTest,
+    file: &FileUnderCheck,
     config: &Config,
-    test_results: &mut TestResults,
+    check_results: &mut CheckResults,
 ) {
     if should_ignore_rule_for_file(
         file,
@@ -48,7 +48,7 @@ pub fn execute_rule_root_node_script_in_same_folder(
         None => return,
     };
     if !script_resource.starts_with("ExtResource(") {
-        test_results.warnings.push(Warning {
+        check_results.warnings.push(Warning {
             message: format!(
                 // TODO https://github.com/greenpixels/godot-arch/issues/5
                 "A scene with a non-external script (e.g. \"built-in scripts\") resource can't be parsed, resource is {}",
@@ -89,7 +89,7 @@ pub fn execute_rule_root_node_script_in_same_folder(
         is_valid = false
     }
 
-    let validation_output = handle_validation_result(
+    handle_validation_result(
         is_valid,
         "rule-root-node-script-in-same-folder".to_owned(),
         format!(
@@ -100,11 +100,7 @@ pub fn execute_rule_root_node_script_in_same_folder(
             "Expected script of root node to be next to the scene-file for '{}'",
             file.absolute_path.bold()
         ),
-        config.should_print_success,
-        test_results,
+        check_results,
         file,
     );
-    if validation_output.is_some() {
-        println!("{}", validation_output.unwrap())
-    }
 }

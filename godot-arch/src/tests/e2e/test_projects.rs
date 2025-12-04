@@ -10,6 +10,6 @@ fn run_e2e_tests() {
     assert!(result.is_ok(), "run_godot_arch failed: {:?}", result.err());
     if let Ok(result) = result {
         assert_eq!(result.files_failed, 0);
-        assert_eq!(result.files_tested > 0, true);
+        assert!(result.files_checked > 0);
     }
 }

@@ -1,49 +1,53 @@
-use std::{
-    fs::{DirEntry, read_dir},
-    io,
-    path::Path,
-};
+use std::{fs::read_dir, path::Path};
 
 use crate::{
-    configuration::config::Config, reporting::test_results::TestResults,
-    util::normalize_path::normalize_path,
+    configuration::config::Config, util::normalize_path::normalize_path,
+    validation::file_under_check::FileUnderCheck,
 };
 use glob_match::glob_match;
 
-pub fn visit_dirs(
-    path_string: &str,
+pub fn collect_files_to_check(
     config: &Config,
+    project_root: &Path,
     dir: &Path,
-    test_results: &mut TestResults,
-    callback: &dyn Fn(&str, &DirEntry, &mut TestResults, &Config),
-) -> io::Result<()> {
-    if dir.is_dir() {
-        for entry in read_dir(dir)? {
-            let entry = entry?;
-            let path = entry.path();
+) -> Option<Vec<FileUnderCheck>> {
+    if !dir.is_dir() {
+        return None;
+    }
+    let read_dir_iter = match read_dir(dir) {
+        Ok(iter) => iter,
+        Err(_) => return None,
+    };
+    let mut files: Vec<FileUnderCheck> = vec![];
+    let project_path = project_root.to_str().unwrap_or("");
+    for entry in read_dir_iter {
+        let Some(entry) = entry.ok() else { continue };
+        let path = entry.path();
 
-            let normalized_path = normalize_path(
-                dir.strip_prefix(path.display().to_string())
-                    .unwrap_or(dir)
-                    .to_str()
-                    .unwrap_or(""),
-            );
+        let normalized_path = normalize_path(
+            dir.strip_prefix(path.display().to_string())
+                .unwrap_or(dir)
+                .to_str()
+                .unwrap_or(""),
+        );
 
-            if config
-                .ignore_patterns
-                .overall
-                .iter()
-                .any(|pattern| glob_match(pattern, &normalized_path))
-            {
-                continue;
+        if config
+            .ignore_patterns
+            .overall
+            .iter()
+            .any(|pattern| glob_match(pattern, &normalized_path))
+        {
+            continue;
+        }
+
+        if path.is_dir() {
+            if let Some(dir_files) = collect_files_to_check(config, project_root, &path) {
+                files.extend(dir_files);
             }
-
-            if path.is_dir() {
-                visit_dirs(path_string, config, &path, test_results, callback)?;
-            } else {
-                callback(path_string, &entry, test_results, config);
-            }
+        } else {
+            files.push(FileUnderCheck::from_dir_entry(&entry, project_path));
         }
     }
-    Ok(())
+
+    Some(files)
 }

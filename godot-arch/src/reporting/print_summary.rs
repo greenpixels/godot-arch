@@ -1,9 +1,9 @@
-use crate::reporting::test_results::TestResults;
+use crate::reporting::check_results::CheckResults;
 
-pub fn print_summary(test_results: &TestResults, elapsed_time: std::time::Duration) {
+pub fn print_summary(check_results: &CheckResults, elapsed_time: std::time::Duration) {
     println!(
-        "\n>\t{} tests of {} total have failed",
-        test_results.files_failed, test_results.files_tested
+        "\n>\t{} checks of {} total have failed",
+        check_results.files_failed, check_results.files_checked
     );
     println!("Total execution time: {:.2?}", elapsed_time);
 }

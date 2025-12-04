@@ -1,15 +1,15 @@
 use crate::{
     rules::rule_root_node_script_in_same_folder::execute_rule_root_node_script_in_same_folder,
     tests::mocks::{
-        get_config_mock, get_file_under_test_mock, get_parsed_scene_file_data_mock,
+        get_config_mock, get_file_under_check_mock, get_parsed_scene_file_data_mock,
         get_scene_external_resource, get_scene_node_mock_with_external_script,
-        get_test_results_mock,
+        get_check_results_mock,
     },
 };
 
-fn assert_results(script_path: &str, expected_files_tested: i32, expected_files_failed: i32) {
-    let mut test_results = get_test_results_mock();
-    let file_under_test = get_file_under_test_mock("resources/my_folder", "file", "tscn");
+fn assert_results(script_path: &str, expected_files_checked: i32, expected_checks_failed: i32) {
+    let mut check_results = get_check_results_mock();
+    let file_under_check = get_file_under_check_mock("resources/my_folder", "file", "tscn");
     let config = get_config_mock();
     let mut parsed_scene = get_parsed_scene_file_data_mock();
 
@@ -26,13 +26,13 @@ fn assert_results(script_path: &str, expected_files_tested: i32, expected_files_
 
     execute_rule_root_node_script_in_same_folder(
         &parsed_scene,
-        &file_under_test,
+        &file_under_check,
         &config,
-        &mut test_results,
+        &mut check_results,
     );
 
-    assert_eq!(test_results.files_tested, expected_files_tested);
-    assert_eq!(test_results.files_failed, expected_files_failed);
+    assert_eq!(check_results.files_checked, expected_files_checked);
+    assert_eq!(check_results.files_failed, expected_checks_failed);
 }
 
 #[test]

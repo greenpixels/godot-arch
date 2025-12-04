@@ -108,13 +108,6 @@ ignorePatterns:
 
 Matches all hidden files (starting with `.`) like `.gitignore`, `.godot`, etc.
 
-## Tips
-
-1. **All paths must start with `./`** - this is required for all patterns
-2. **Use `**` for recursive matching** across directory levels
-3. **Test your patterns** by running godot-arch with `shouldPrintSuccess: true`
-4. **Be specific** to avoid unintended matches
-5. **Use `ignorePatterns.overall`** for project-wide exclusions like `addons` or `.godot`
 
 ## Pattern Precedence
 

@@ -1,7 +1,5 @@
-use colored::Colorize;
-
 use crate::reporting::report_entry::ReportEntry;
-use crate::validation::file_under_test::FileUnderTest;
+use crate::validation::file_under_check::FileUnderCheck;
 
 fn strip_ansi_codes(text: &str) -> String {
     let ansi_regex = regex::Regex::new(r"\x1b\[[0-9;]*m").unwrap();
@@ -13,38 +11,22 @@ pub fn handle_validation_result(
     rule_name: String,
     success_message: String,
     error_message: String,
-    should_print_success: bool,
-    test_results: &mut crate::reporting::test_results::TestResults,
-    file_under_test: &FileUnderTest,
-) -> Option<String> {
-    test_results.files_tested += 1;
+    check_results: &mut crate::reporting::check_results::CheckResults,
+    file_under_check: &FileUnderCheck,
+) {
+    check_results.files_checked += 1;
     if is_success {
-        test_results.successful_reports.push(ReportEntry {
-            absolute_file_path: file_under_test.absolute_path.clone(),
+        check_results.successful_reports.push(ReportEntry {
+            absolute_file_path: file_under_check.absolute_path.clone(),
             message: strip_ansi_codes(&success_message.clone()),
             rule_name: rule_name.clone(),
         });
-
-        if !should_print_success {
-            return None;
-        }
-        return Some(format!(
-            "{} ({}): {}",
-            "Test Succesful".green(),
-            rule_name.bright_black(),
-            success_message,
-        ));
+    } else {
+        check_results.failed_reports.push(ReportEntry {
+            absolute_file_path: file_under_check.absolute_path.clone(),
+            message: strip_ansi_codes(&error_message.clone()),
+            rule_name: rule_name.clone(),
+        });
+        check_results.files_failed += 1;
     }
-    test_results.failed_reports.push(ReportEntry {
-        absolute_file_path: file_under_test.absolute_path.clone(),
-        message: strip_ansi_codes(&error_message.clone()),
-        rule_name: rule_name.clone(),
-    });
-    test_results.files_failed += 1;
-    Some(format!(
-        "{} ({}): {}",
-        "Test Failed".red(),
-        rule_name.bright_black(),
-        error_message
-    ))
 }
