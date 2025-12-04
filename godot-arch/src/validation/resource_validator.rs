@@ -1,15 +1,15 @@
 use godot_properties_parser::parsers::parser_property_file::PropertyFile;
 
 use crate::{
-    configuration::config::Config, reporting::test_results::TestResults,
+    configuration::config::Config, reporting::check_results::CheckResults,
     rules::rule_allowed_custom_resource_location::execute_rule_allowed_custom_resource_location,
-    validation::file_under_test::FileUnderTest,
+    validation::file_under_check::FileUnderCheck,
 };
 
 pub fn validate_resource_file(
     parsed_resource_file: PropertyFile,
-    file: &FileUnderTest,
-    test_results: &mut TestResults,
+    file: &FileUnderCheck,
+    check_results: &mut CheckResults,
     config: &Config,
 ) {
     let header_type = match parsed_resource_file.sections.first() {
@@ -31,6 +31,6 @@ pub fn validate_resource_file(
         script_class_property.value.as_str(),
         file,
         config,
-        test_results,
+        check_results,
     );
 }

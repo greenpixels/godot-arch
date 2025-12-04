@@ -2,16 +2,16 @@ use colored::Colorize;
 use convert_case::{Case, Casing};
 
 use crate::{
-    configuration::config::Config, reporting::test_results::TestResults,
+    configuration::config::Config, reporting::check_results::CheckResults,
     rules::handle_validation_result::handle_validation_result,
     util::should_ignore_rule_for_file::should_ignore_rule_for_file,
-    validation::file_under_test::FileUnderTest,
+    validation::file_under_check::FileUnderCheck,
 };
 
 pub fn execute_rule_filename_snake_case(
-    file: &FileUnderTest,
+    file: &FileUnderCheck,
     config: &Config,
-    test_results: &mut TestResults,
+    check_results: &mut CheckResults,
 ) {
     if should_ignore_rule_for_file(
         file,
@@ -37,7 +37,7 @@ pub fn execute_rule_filename_snake_case(
             file.file_name.to_case(Case::Snake).bold(),
             file.file_name.bold()
         ),
-        test_results,
+        check_results,
         file,
     );
 }

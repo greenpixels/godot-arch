@@ -1,9 +1,9 @@
 use crate::configuration::config::Config;
-use crate::validation::file_under_test::FileUnderTest;
+use crate::validation::file_under_check::FileUnderCheck;
 use glob_match::glob_match;
 
 pub fn should_ignore_rule_for_file(
-    file: &FileUnderTest,
+    file: &FileUnderCheck,
     include_patterns: Option<Vec<String>>,
     ignore_patterns: Option<Vec<String>>,
     config: &Config,

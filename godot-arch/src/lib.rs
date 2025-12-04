@@ -14,8 +14,8 @@ use crate::util::ansi::enable_ansi_support_on_windows;
 use crate::{
     configuration::config::load_config,
     reporting::{
-        print_summary::print_summary, print_warnings::print_warnings, report_writer::write_report,
-        test_results::TestResults,
+        check_results::CheckResults, print_summary::print_summary, print_warnings::print_warnings,
+        report_writer::write_report,
     },
     util::visit_dirs::visit_dirs,
     validation::process_file::process_file,
@@ -25,12 +25,12 @@ pub fn run_godot_arch(
     config_path: &str,
     project_path: &str,
     report_location: Option<String>,
-) -> Result<TestResults, Box<dyn std::error::Error>> {
+) -> Result<CheckResults, Box<dyn std::error::Error>> {
     enable_ansi_support_on_windows();
     let config = load_config(config_path)?;
     let start_time = std::time::Instant::now();
 
-    let mut test_results = TestResults::default();
+    let mut check_results = CheckResults::default();
 
     let path = Path::new(project_path);
 
@@ -50,18 +50,18 @@ pub fn run_godot_arch(
                 if result.is_none() {
                     continue;
                 }
-                test_results.merge(result.unwrap_or(TestResults::default()));
+                check_results.merge(result.unwrap_or(CheckResults::default()));
             }
         }
     }
 
-    print_warnings(&test_results);
+    print_warnings(&check_results);
 
     let elapsed_time = start_time.elapsed();
-    print_summary(&test_results, elapsed_time);
+    print_summary(&check_results, elapsed_time);
 
     if let Some(location) = report_location
-        && let Err(e) = write_report(&location, &test_results)
+        && let Err(e) = write_report(&location, &check_results)
     {
         eprintln!("Error writing report: {}", e);
     }
@@ -70,5 +70,5 @@ pub fn run_godot_arch(
         println!("\nPress any button to exit ...");
         io::stdin().read_line(&mut String::new()).unwrap();
     }
-    Ok(test_results)
+    Ok(check_results)
 }

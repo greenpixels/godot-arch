@@ -1,7 +1,7 @@
 use std::{fs::DirEntry, path::PathBuf};
 
 #[derive(Debug, Clone)]
-pub struct FileUnderTest {
+pub struct FileUnderCheck {
     pub absolute_path: String,
     pub relative_path: String,
     pub file_name: String,
@@ -9,7 +9,7 @@ pub struct FileUnderTest {
     pub extension: String,
 }
 
-impl FileUnderTest {
+impl FileUnderCheck {
     pub fn from_dir_entry(entry: &DirEntry, project_path: &str) -> Self {
         use crate::util::normalize_path::normalize_path;
 
@@ -32,7 +32,7 @@ impl FileUnderTest {
         let relative_path =
             normalize_path(full_path.strip_prefix(project_path).unwrap_or(&file_name));
 
-        FileUnderTest {
+        FileUnderCheck {
             absolute_path,
             relative_path,
             file_name,

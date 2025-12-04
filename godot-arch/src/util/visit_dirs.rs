@@ -2,11 +2,11 @@ use std::{fs::read_dir, path::Path};
 
 use crate::{
     configuration::config::Config, util::normalize_path::normalize_path,
-    validation::file_under_test::FileUnderTest,
+    validation::file_under_check::FileUnderCheck,
 };
 use glob_match::glob_match;
 
-pub fn visit_dirs(config: &Config, dir: &Path) -> Option<Vec<FileUnderTest>> {
+pub fn visit_dirs(config: &Config, dir: &Path) -> Option<Vec<FileUnderCheck>> {
     visit_dirs_internal(config, dir, dir)
 }
 
@@ -14,7 +14,7 @@ fn visit_dirs_internal(
     config: &Config,
     project_root: &Path,
     dir: &Path,
-) -> Option<Vec<FileUnderTest>> {
+) -> Option<Vec<FileUnderCheck>> {
     if !dir.is_dir() {
         return None;
     }
@@ -22,7 +22,7 @@ fn visit_dirs_internal(
         Ok(iter) => iter,
         Err(_) => return None,
     };
-    let mut files: Vec<FileUnderTest> = vec![];
+    let mut files: Vec<FileUnderCheck> = vec![];
     let project_path = project_root.to_str().unwrap_or("");
     for entry in read_dir_iter {
         let Some(entry) = entry.ok() else { continue };
@@ -49,7 +49,7 @@ fn visit_dirs_internal(
                 files.extend(dir_files);
             }
         } else {
-            files.push(FileUnderTest::from_dir_entry(&entry, project_path));
+            files.push(FileUnderCheck::from_dir_entry(&entry, project_path));
         }
     }
 

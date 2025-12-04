@@ -2,16 +2,16 @@ use colored::Colorize;
 use glob_match::glob_match;
 
 use crate::{
-    configuration::config::Config, reporting::test_results::TestResults,
+    configuration::config::Config, reporting::check_results::CheckResults,
     rules::handle_validation_result::handle_validation_result,
     util::should_ignore_rule_for_file::should_ignore_rule_for_file,
-    validation::file_under_test::FileUnderTest,
+    validation::file_under_check::FileUnderCheck,
 };
 
 pub fn execute_rule_allowed_file_location(
-    file: &FileUnderTest,
+    file: &FileUnderCheck,
     config: &Config,
-    test_results: &mut TestResults,
+    check_results: &mut CheckResults,
 ) {
     if should_ignore_rule_for_file(
         file,
@@ -54,7 +54,7 @@ pub fn execute_rule_allowed_file_location(
             folders_list.bold(),
             file.relative_path.bold(),
         ),
-        test_results,
+        check_results,
         file,
     );
 }

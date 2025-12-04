@@ -4,22 +4,22 @@ use std::{path::PathBuf, vec};
 use crate::configuration::config::Config;
 use crate::configuration::ignore_patterns::IgnorePatterns;
 use crate::configuration::include_patterns::IncludePatterns;
-use crate::reporting::test_results::TestResults;
-use crate::validation::file_under_test::FileUnderTest;
+use crate::reporting::check_results::CheckResults;
+use crate::validation::file_under_check::FileUnderCheck;
 use godot_properties_parser::parsers::{
     parser_property::UntypedProperty, parser_property_file::Section, parser_scene_file::SceneFile,
 };
 
-pub fn get_test_results_mock() -> TestResults {
-    TestResults::default()
+pub fn get_check_results_mock() -> CheckResults {
+    CheckResults::default()
 }
 
-pub fn get_file_under_test_mock(
+pub fn get_file_under_check_mock(
     path_in_godot: &str,
     file_base_name: &str,
     extension: &str,
-) -> FileUnderTest {
-    FileUnderTest {
+) -> FileUnderCheck {
+    FileUnderCheck {
         path: PathBuf::from(format!(
             "./{}/{}.{}",
             path_in_godot, file_base_name, extension
